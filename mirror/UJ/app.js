@@ -53,10 +53,21 @@ async function run() {
     const img = await canvas.loadImage('public/models/WIN_20220722_15_24_48_Pro.jpg')
 
     // detect the faces with landmarks
-    const results = await faceapi.detectAllFaces(img, faceDetectionOptions)
+    const detection = await faceapi.detectSingleFace(img, faceDetectionOptions)
+    left = detection.box.left
+    right= detection.box.right
+    topLeft= detection.box.topLeft
+    topRight= detection.box.topRight
+    console.log('left :' + left)
+    
+    console.log('right :' + right)
+    console.log('topRight :' + topRight.x +':' + topRight.y)
+    //  constructor(score: number, relativeBox: Rect, imageDims: IDimensions);
+   // forSize(width: number, height: number): FaceDetection;
     // create a new canvas and draw the detection and landmarks
     const out = faceapi.createCanvasFromMedia(img)
-    faceapi.draw.drawDetections(out, results)
+    faceapi.FaceDetection
+    faceapi.draw.drawDetections(out, detection)
     //faceapi.drawLandmarks(out, results.map(res => res.landmarks), { drawLines: true, color: 'red' })
 
     // save the new canvas as image
