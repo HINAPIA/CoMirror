@@ -4,6 +4,9 @@ const recorder = require('node-record-lpcm16');
 // Imports the Google Cloud client library
 const speech = require('@google-cloud/speech');
 
+const mqtt = require('mqtt');
+const mqtt_client = mqtt.connect("mqtt://test.mosquitto.org")
+
 console.log("stt load");
 
 
@@ -50,9 +53,12 @@ function stt(data){
   let value = data.results[0] && data.results[0].alternatives[0]
   ? `Transcription: ${data.results[0].alternatives[0].transcript}\n`
   : '\n\nReached transcription time limit, press Ctrl+C\n'
-  if (value.includes("메모")) return `받은 내용: ${value} -> 메모가 포함됨\n`;
+  if (value.includes("메모")) {
+    mqtt_client.publish('memo',value);
+    return `받은 내용: ${value} -> 메모가 포함됨\n`
+  };
   
-  return `받은 내용: ${value} -> 메모가 아닙니다\n`;
+  // return `받은 내용: ${value} -> 메모가 아닙니다\n`;
 }
 // Start recording and send the microphone input to the Speech API.
 // Ensure SoX is installed, see https://www.npmjs.com/package/node-record-lpcm16#dependencies
