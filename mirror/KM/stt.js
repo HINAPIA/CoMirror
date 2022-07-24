@@ -1,13 +1,12 @@
+const mqtt = require('mqtt')
+const mqttClient = mqtt.connect("mqtt://test.mosquitto.org")
 
 const recorder = require('node-record-lpcm16');
 
 // Imports the Google Cloud client library
 const speech = require('@google-cloud/speech');
 
-console.log("stt load");
-
-
-  console.log("stt start");
+console.log("stt start");
 
   // Creates a client
 const client = new speech.SpeechClient( {keyFilename: "stt.json"});
@@ -41,7 +40,7 @@ const recognizeStream = client
   .on('error', console.error)
   .on('data', data =>
     process.stdout.write(
-     stt(data)
+      stt(data)
     )
     
   );
@@ -50,8 +49,12 @@ function stt(data){
   let value = data.results[0] && data.results[0].alternatives[0]
   ? `Transcription: ${data.results[0].alternatives[0].transcript}\n`
   : '\n\nReached transcription time limit, press Ctrl+C\n'
-  if (value.includes("메모")) return `받은 내용: ${value} -> 메모가 포함됨\n`;
-  
+  if (value.includes("메모")) {
+    mqttClient.publish('memo',value);
+      return `받은 내용: ${value} -> 메모가 포함됨\n`;
+  }
+
+  mqttClient.publish('memo',value);
   return `받은 내용: ${value} -> 메모가 아닙니다\n`;
 }
 // Start recording and send the microphone input to the Speech API.
