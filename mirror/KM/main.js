@@ -12,7 +12,7 @@ function createWindow() {
     //options.autoHideMenuBar = true;
     const win = new BrowserWindow(options);
     
-    win.webContents.openDevTools();  
+    //win.webContents.openDevTools();  
     win.loadFile("index.html");
 }
 

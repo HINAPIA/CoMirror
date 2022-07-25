@@ -76,22 +76,32 @@ function stt(data){
     return `메모 전달 내용: ${value}\n`;
   }
 }
+
 // Start recording and send the microphone input to the Speech API.
 // Ensure SoX is installed, see https://www.npmjs.com/package/node-record-lpcm16#dependencies
-recorder
+const recording = recorder
   .record({
     sampleRateHertz: sampleRateHertz,
     threshold: 0,
     // Other options, see https://www.npmjs.com/package/node-record-lpcm16#options
     verbose: false,
-    recordProgram: 'sox', // Try also "arecord" or "sox"
+    recordProgram: 'rec', // Try also "arecord" or "sox"
     silence: '3.0',
     sampleRate: 16000 ,
     thresholdEnd: 1,
     threshold: 0.5,
-  })
-  .stream()
-  .on('error', console.error)
+  });
+
+  recording.stream().on('error', console.error)
   .pipe(recognizeStream);
+
+
+  mqttClient.subscribe('stt_stop');
+  
+  mqttClient.on('message', function(topic, message){
+      if(topic.toString() == 'stt_stop'){
+        recording.stop();
+      }
+  });
 
   console.log('Listening, press Ctrl+C to stop.');

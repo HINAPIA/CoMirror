@@ -21,11 +21,17 @@
             memo
         </div>
 
-        <div id="sticker">
-            <img id="stickerImg" src = "memo_module/img/sticker.png">
+        <div id="sticker" onclick="f1()">
+            <img id="stickerImg" src="memo_module/img/sticker.png">
         </div>
 
         <script type="module" src="app.js"></script>
         <script src="memo_module/create_memo.js"></script>
+        <script>
+            const weather = require('./memo_module/create_memo.js');
+            function f1(){
+                stt_stop();
+            }
+        </script>
     </body>
 </html>

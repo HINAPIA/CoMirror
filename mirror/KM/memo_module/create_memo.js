@@ -7,7 +7,7 @@ const options = {
   port: 1883
 };
 
-client = mqtt.connect(options);
+const client = mqtt.connect(options);
 
 
 client.subscribe('create_memo');
@@ -24,3 +24,23 @@ client.on('message', function(topic, message){
     }
 });
 
+var i = 0;
+var stt_stop = function(){
+    console.log('call stt_stop');
+    /*
+    i++;
+    if(i%2 == 0){
+        document.getElementById('stickerImg').src = 'memo_module/img/call.png';
+    }
+    else {
+        document.getElementById('stickerImg').src = 'memo_module/img/sticker.png';
+    }
+    */
+    client.publish('stt_stop',"stop");
+}
+
+//document.getElementById('sticker').onclick = stt_stop();
+
+module.exports = function() {
+    stt_stop();
+};
