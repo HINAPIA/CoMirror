@@ -7,6 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import Normalizer
 from sklearn.svm import SVC
 from matplotlib import pyplot
+import tensorflowjs as tfjs
 # 얼굴 불러오기
 data = load('face.npz')
 testX_faces = data['arr_2']
@@ -36,7 +37,7 @@ score_test = accuracy_score(testy, yhat_test)
 print('정확도: 훈련=%.3f, 테스트=%.3f' % (score_train*100, score_test*100))
 
 # 테스트 데이터셋에서 임의의 예제에 대한 테스트 모델
-for i in range(10):
+for i in range(1):
     selection = choice([i for i in range(testX.shape[0])])
     random_face_pixels = testX_faces[selection]
     random_face_emb = testX[selection]
@@ -57,3 +58,5 @@ for i in range(10):
     title = '%s (%.3f)' % (predict_names[0], class_probability)
     pyplot.title(title)
     pyplot.show()
+
+tfjs.converters.save_keras_model(model, './data')

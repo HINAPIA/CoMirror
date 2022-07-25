@@ -12,7 +12,12 @@
     "@tensorflow/tfjs-node": "^3.19.0",
     "canvas": "^2.9.3",
     "face-api.js": "^0.22.2",
+    "flash-store": "^1.0.6",
     "imstall": "^1.0.35",
-    "jimp": "^0.16.1"
+    "jimp": "^0.16.1",
+    "keras-js": "^1.0.3",
+    "node-sass": "^7.0.1",
+    "npm-git-install": "^0.3.0",
+    "numjs": "^0.16.1"
   }
 }
