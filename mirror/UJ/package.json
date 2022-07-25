@@ -11,6 +11,8 @@
   "dependencies": {
     "@tensorflow/tfjs-node": "^3.19.0",
     "canvas": "^2.9.3",
-    "face-api.js": "^0.22.2"
+    "face-api.js": "^0.22.2",
+    "imstall": "^1.0.35",
+    "jimp": "^0.16.1"
   }
 }

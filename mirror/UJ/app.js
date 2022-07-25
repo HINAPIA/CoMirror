@@ -2,14 +2,17 @@
 // 그리고 npm i 
 const faceapi = require("face-api.js")  
 const canvas = require("canvas")  
+const Jimp = require("jimp")
 const fs = require("fs")  
 const path = require("path")
+const { createContext } = require("vm")
+
 
 // mokey pathing the faceapi canvas
 const { Canvas, Image, ImageData } = canvas  
 faceapi.env.monkeyPatch({ Canvas, Image, ImageData })
-
 const faceDetectionNet = faceapi.nets.ssdMobilenetv1
+
 
 // SsdMobilenetv1Options
 const minConfidence = 0.5
@@ -42,36 +45,55 @@ function saveFile(fileName, buf) {
     // is bad practice in NodeJS
     fs.writeFileSync(path.resolve(baseDir, fileName), buf)
   }
+  
+async function crop(detection, imgUrl){
+  const image = await Jimp.read(imgUrl)
+  x = detection.box.topLeft.x
+  y = detection.box.topLeft.y
+  width = detection.box.width
+  height = detection.box.height
+  image.crop(x,y,width, height).write('./out/5.jpg')
 
+}
 async function run() {
 
+    
     // load weights
     await faceDetectionNet.loadFromDisk('./face-api.js/weights')
     await faceapi.nets.faceLandmark68Net.loadFromDisk('./face-api.js/weights')
 
     // load the image
-    const img = await canvas.loadImage('public/models/WIN_20220722_15_24_48_Pro.jpg')
-
-    // detect the faces with landmarks
-    const detection = await faceapi.detectSingleFace(img, faceDetectionOptions)
-    left = detection.box.left
-    right= detection.box.right
-    topLeft= detection.box.topLeft
-    topRight= detection.box.topRight
-    console.log('left :' + left)
+    let imgurl = 'public/models/5.jpg'
+    const image = await canvas.loadImage(imgurl)
+    await faceapi.detectSingleFace(image, faceDetectionOptions)
+      .then(detection =>{    
+        crop(detection,imgurl)
+      })
     
-    console.log('right :' + right)
-    console.log('topRight :' + topRight.x +':' + topRight.y)
+   
+      
+    
+  //  saveFile('faceLandmarkDetection.jpg', out.toBuffer('image/jpeg'))
+    
+    //   const out = faceapi.createCanvasFromMedia(image)
+    //   faceapi.draw.drawDetections(out, detection)
+    //  
+    // })
+    // detect the faces with landmarks
+   // const detection = await faceapi.detectSingleFace(img, faceDetectionOptions)
+   // left = detection.box.left
+
+   // console.log('topRight :' + topRight.x +':' + topRight.y)
+  
+   
     //  constructor(score: number, relativeBox: Rect, imageDims: IDimensions);
    // forSize(width: number, height: number): FaceDetection;
     // create a new canvas and draw the detection and landmarks
-    const out = faceapi.createCanvasFromMedia(img)
-    faceapi.FaceDetection
-    faceapi.draw.drawDetections(out, detection)
+    
     //faceapi.drawLandmarks(out, results.map(res => res.landmarks), { drawLines: true, color: 'red' })
 
     // save the new canvas as image
-    saveFile('faceLandmarkDetection.jpg', out.toBuffer('image/jpeg'))
+  
     console.log('done, saved results to out/faceLandmarkDetection.jpg')
 }
 
