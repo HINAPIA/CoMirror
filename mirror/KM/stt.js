@@ -1,5 +1,13 @@
+
 const mqtt = require('mqtt')
-const mqttClient = mqtt.connect("mqtt://test.mosquitto.org")
+//const mqttClient = mqtt.connect("mqtt://test.mosquitto.org")
+
+const options = {
+  host: '127.0.0.1',
+  port: 1883
+};
+
+mqttClient = mqtt.connect(options);
 
 const recorder = require('node-record-lpcm16');
 
@@ -54,6 +62,7 @@ function stt(data){
   if(create_memo == 0) {
     if (value.includes("메모")) {
       create_memo = 1;
+      //publish('create_memo',"create");
       mqttClient.publish('create_memo',"create");
         return `받은 내용: ${value} -> 메모 호출\n`;
     }
@@ -62,6 +71,7 @@ function stt(data){
   }
   else {
     create_memo = 0;
+    //publish('memo_content',value);
     mqttClient.publish('memo_content',value);
     return `메모 전달 내용: ${value}\n`;
   }
