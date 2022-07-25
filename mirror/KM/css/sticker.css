@@ -1,4 +1,17 @@
-#spadeA { z-index :-3; left : 10px; top : 20px; }
-#spade2 { z-index : 2; left : 40px; top : 30px; }
-#spade3 { z-index : 3; left : 80px; top : 40px; }
-#spade7 { z-index : 7; left : 120px; top : 50px; }
+#sticker {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+}
+
+#stickerImg {
+    width: 200px; 
+    height: 200px;
+}
+
+#memo  {
+    position: absolute;
+    bottom: 250px;
+    width: 100%;
+    text-align: center;
+}
