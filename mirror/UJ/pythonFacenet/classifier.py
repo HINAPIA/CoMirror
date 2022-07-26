@@ -7,7 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import Normalizer
 from sklearn.svm import SVC
 from matplotlib import pyplot
-import tensorflowjs as tfjs
+
 # 얼굴 불러오기
 data = load('face.npz')
 testX_faces = data['arr_2']
@@ -58,5 +58,3 @@ for i in range(1):
     title = '%s (%.3f)' % (predict_names[0], class_probability)
     pyplot.title(title)
     pyplot.show()
-
-tfjs.converters.save_keras_model(model, './data')

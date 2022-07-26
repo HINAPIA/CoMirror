@@ -1,9 +1,10 @@
-from os import listdir
+import os
 from os.path import isdir
 from PIL import Image
 from matplotlib import pyplot
 from numpy import savez_compressed
 from numpy import asarray
+from numpy import array
 from mtcnn.mtcnn import MTCNN
 
 
@@ -11,12 +12,13 @@ from mtcnn.mtcnn import MTCNN
 def load_faces(directory):
     faces = list()
 	# 파일 열거
-    for filename in listdir(directory):
+    for filename in os.listdir(directory):
         # 경로
         path = directory + filename
         # 얼굴 추출
         #face = extract_face(path)
         image = Image.open(path)
+        # 배열로 변환
         face_array = asarray(image)
         # 저장
         faces.append(face_array)
@@ -26,7 +28,8 @@ def load_faces(directory):
 def load_dataset(directory):
 	X, y = list(), list()
 	# 클래스별로 폴더 열거
-	for subdir in listdir(directory):
+
+	for subdir in os.listdir(directory):
 		# 경로
 		path = directory + subdir + '/'
 		# 디렉토리에 있을 수 있는 파일을 건너뛰기(디렉토리가 아닌 파일)
@@ -45,10 +48,7 @@ def load_dataset(directory):
 	return asarray(X), asarray(y)
 
 # 훈련 데이터셋 불러오기
-trainX, trainy = load_dataset('C:/Users/hansung/Documents/GitHub/Mirror/mirror/UJ/pythonFacenet/face/train')
+trainX, trainy = load_dataset('C:/Users/hansung/Documents/GitHub/Mirror/mirror/UJ/train/face/train/')
 print(trainX.shape, trainy.shape)
-# 테스트 데이터셋 불러오기
-#testX, testy = load_dataset('./face/val/')
-#print(testX.shape, testy.shape)
 # 배열을 단일 압축 포맷 파일로 저장
-savez_compressed('face.npz', trainX, trainy)
+savez_compressed('./trainface.npz', trainX, trainy)

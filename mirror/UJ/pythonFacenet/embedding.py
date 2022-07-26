@@ -4,7 +4,6 @@ from numpy import expand_dims
 from numpy import asarray
 from numpy import savez_compressed
 from keras.models import load_model
-import tensorflowjs as tfjs
 import h5py
 # 하나의 얼굴의 얼굴 임베딩 얻기
 def get_embedding(model, face_pixels):
@@ -28,7 +27,6 @@ print('불러오기: ', trainX.shape, trainy.shape, testX.shape, testy.shape)
 #h5 = h5py.File('./facenet_keras.h5', "r")
 
 model = load_model('facenet_keras.h5')
-tfjs.converters.save_keras_model(model, './data')
 print('모델 불러오기')
 # 훈련 셋에서 각 얼굴을 임베딩으로 변환하기
 newTrainX = list()

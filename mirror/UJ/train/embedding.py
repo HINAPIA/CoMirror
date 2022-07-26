@@ -15,8 +15,11 @@ def get_embedding(model, face_pixels):
         mean, std = face_pixels.mean(), face_pixels.std()
         face_pixels = (face_pixels - mean) / std
         # 얼굴을 하나의 샘플로 변환
+<<<<<<< Updated upstream
 
         
+=======
+>>>>>>> Stashed changes
         samples = expand_dims(face_pixels, axis=0)
         # 임베딩을 갖기 위한 예측 생성
         yhat = model.predict(samples)        
