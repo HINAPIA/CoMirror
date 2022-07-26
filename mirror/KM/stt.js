@@ -1,6 +1,5 @@
 
 const mqtt = require('mqtt')
-//const mqttClient = mqtt.connect("mqtt://test.mosquitto.org")
 
 const options = {
   host: '127.0.0.1',
@@ -90,7 +89,7 @@ let recording = recorder
   recording.stream().on('error', console.error)
   .pipe(recognizeStream);
 
-/*
+  
   mqttClient.subscribe('stt_stop');
   
   let exist = true;
@@ -113,11 +112,7 @@ let recording = recorder
         
       }
   });
-*/
 
-setTimeout(() => {
-  recording.stop();
-}, 1000);
 
 
   console.log('Listening, press Ctrl+C to stop.');
