@@ -15,31 +15,31 @@ var pool = mysql.createPool({
 var createColumns = function(data, table_name, callback) {
     console.log('addUser call');
 
-// 커넥션 풀에 연결 객체 가져오기
-pool.getConnection(function(err,conn){
-    if(err){
-        if(conn){
-            conn.release();
-        }
-        callback(err,null);
-        return;
-    }
-    console.log("data base connected id: "+conn.threadId);
-
-    //sql문 실행
-    var exec=conn.query(`insert into ${table_name} set ?`, data, function(err, result){
-        conn.release(); // 반드시 해제 해야함
-        console.log('sql : '+exec.sql);
-
+    // 커넥션 풀에 연결 객체 가져오기
+    pool.getConnection(function(err,conn){
         if(err){
-            console.log('SQL error');
-
-            callback(err, null);
+            if(conn){
+                conn.release();
+            }
+            callback(err,null);
             return;
         }
-        callback(null,result);
+        console.log("data base connected id: "+conn.threadId);
+
+        //sql문 실행
+        var exec=conn.query(`insert into ${table_name} set ?`, data, function(err, result){
+            conn.release(); // 반드시 해제 해야함
+            console.log('sql : '+exec.sql);
+
+            if(err){
+                console.log('SQL error');
+
+                callback(err, null);
+                return;
+            }
+            callback(null,result);
+        });
     });
-});
 }
 
 // 사용자를 등록하는 함수

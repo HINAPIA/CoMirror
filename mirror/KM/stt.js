@@ -19,11 +19,6 @@ console.log("stt start");
   // Creates a client
 const client = new speech.SpeechClient( {keyFilename: "stt.json"});
 
-//const client = new speech.SpeechClient();
-
-/**
- * TODO(developer): Uncomment the following lines before running the sample.
- */
 
 const encoding='LINEAR16'; 
 //flac필요없이 잘만 되더라.
@@ -79,13 +74,13 @@ function stt(data){
 
 // Start recording and send the microphone input to the Speech API.
 // Ensure SoX is installed, see https://www.npmjs.com/package/node-record-lpcm16#dependencies
-const recording = recorder
+let recording = recorder
   .record({
     sampleRateHertz: sampleRateHertz,
     threshold: 0,
     // Other options, see https://www.npmjs.com/package/node-record-lpcm16#options
     verbose: false,
-    recordProgram: 'rec', // Try also "arecord" or "sox"
+    recordProgram: 'sox', // Try also "arecord" or "sox"
     silence: '3.0',
     sampleRate: 16000 ,
     thresholdEnd: 1,
@@ -95,13 +90,34 @@ const recording = recorder
   recording.stream().on('error', console.error)
   .pipe(recognizeStream);
 
-
+/*
   mqttClient.subscribe('stt_stop');
   
+  let exist = true;
+
   mqttClient.on('message', function(topic, message){
       if(topic.toString() == 'stt_stop'){
-        recording.stop();
+        if(exist==true){
+          exist=false;
+          console.log(recording+'\n');
+          recording.stop();
+          console.log(recording+'\n');
+          console.log("stop");
+        }
+        else if(exist==false){
+          exist=true;
+          recording.stream().on('error', console.error)
+          .pipe(recognizeStream);
+          console.log('start');
+        }
+        
       }
   });
+*/
+
+setTimeout(() => {
+  recording.stop();
+}, 1000);
+
 
   console.log('Listening, press Ctrl+C to stop.');
