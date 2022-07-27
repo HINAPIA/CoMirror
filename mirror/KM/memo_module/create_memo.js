@@ -32,19 +32,6 @@ client.on('message', function (topic, message) {
     }
 });
 
-// function f1(){
-//     const user_id = 1;
-//     const contents ='dddddd';
-//     const store = 0;
-//     const delete_time = 0;
-//     dbAccess.addMemo(user_id, contents, store, delete_time);
-// }
-
-function f1(){
-    console.log('select_re: ' + dbAccess.selectColumns('seq', 'user', 'user_id=1'));
-}
-
-f1();
 var i = 0;
 var stt_stop = function () {
     console.log('call stt_stop');

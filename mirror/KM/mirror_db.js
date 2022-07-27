@@ -52,91 +52,69 @@ var createColumns = function (data, table_name) {
         .catch(err => {
             console.log(err.stack);
         })
-        return;
+    return;
 }
 
 
-const selectColumns = function (select, table_name, where) {
+const selectPromise = (select, from, where)  => new Promise((resolve, reject) => {
 
-    const selectPromise = new Promise((resolve, reject) => {
-        console.log('selectColumns call');
-
-        // 커넥션 풀에 연결 객체 가져오기
-        pool.getConnection(function (err, conn) {
-            if (err) {
-                if (conn) {
-                    conn.release();
-                }
-                reject(err);
-                //promise.reject(err);
+    pool.getConnection(function (err, conn) {
+        if (err) {
+            if (conn) {
+                conn.release();
             }
-            console.log("data base connected id: " + conn.threadId);
+            reject(err);
+            //promise.reject(err);
+        }
+        console.log("select2 || data base connected id: " + conn.threadId);
 
-            //sql문 실행
-            var exec = conn.query(`select ${select} from ${table_name} where ${where}`, function (err, result) {
-                conn.release(); // 반드시 해제 해야함
-                console.log('sql : ' + exec.sql);
+        //sql문 실행
+        var exec = conn.query(`select ${select} from ${from} where ${where}`, function (err, result) {
+            conn.release(); // 반드시 해제 해야함
+            console.log('select3 || sql : ' + exec.sql);
 
-                if (result.length <= 0) {
-                    console.log('SQL error');
-                    resolve(null);
-                }
-                else {
-                    resolve(result);
-                }
-            });
-        });
-    });
-    selectPromise
-        .then(value => {
-            if (value) {
-                console.log('then: ' + value.length);
-                console.log('select');
-                return value.length;
+            if (result.length <= 0) {
+                console.log('select3 || SQL error');
+                resolve(null);
             }
             else {
-                console.log('dont select');
-                return null;
+                resolve(result);
             }
-        })
-        .catch(err => {
-            console.log(err.stack);
+        });
+    });
+});
+    // 사용자를 등록하는 함수
+    dbAccess.addUser = function (user_id, name) {
+        if (!pool) {
+            console.log('error');
             return;
-        })
-}
+        }
+        console.log('addUser call');
 
-dbAccess.selectColumns = selectColumns;
-
-// 사용자를 등록하는 함수
-dbAccess.addUser = function (user_id, name) {
-    if (!pool) {
-        console.log('error');
-        return;
+        //데이터 객체로
+        var data = { user_id: user_id, name: name };
+        createColumns(data, 'user',);
     }
-    console.log('addUser call');
 
-    //데이터 객체로
-    var data = { user_id: user_id, name: name };
-    createColumns(data, 'user',);
-}
+    // 메모 생성하는 함수
+    dbAccess.addMemo = function (user_id, contents, store, delete_time) {
+        if (!pool) {
+            console.log('error');
+            return;
+        }
+        console.log('addMemo call');
+        selectPromise('seq','memo','user_id=1')
+            .then(value => {
+                console.log('value: ' + value);
+                console.log('value: ' + value.length);
+                //데이터 객체
+                var data = { user_id: user_id, seq: value.length, contents: contents, store: store, delete_time: delete_time };
 
-// 메모 생성하는 함수
-dbAccess.addMemo = function (user_id, contents, store, delete_time) {
-    if (!pool) {
-        console.log('error');
-        return;
+                createColumns(data, 'memo');
+            });
     }
-    console.log('addMemo call');
+    if (pool) {
+        dbAccess.addMemo(1, '안녕', 0, 1);
+    }
 
-    value = selectColumns('seq', 'memo', `user_id=${user_id}`);
-    console.log('value: ' + value);
-    //데이터 객체
-    var data = { user_id: user_id, seq: value, contents: contents, store: store, delete_time: delete_time };
-
-    createColumns(data, 'memo');
-}
-if (pool) {
-    dbAccess.addMemo(1, '안녕', 0, 1);
-}
-
-module.exports = dbAccess;
+    module.exports = dbAccess;
