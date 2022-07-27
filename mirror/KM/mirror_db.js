@@ -73,12 +73,15 @@ const selectPromise = (select, from, where)  => new Promise((resolve, reject) =>
             conn.release(); // 반드시 해제 해야함
             console.log('select3 || sql : ' + exec.sql);
 
-            if (result.length <= 0) {
+            if (result.length < 0) {
                 console.log('select3 || SQL error');
                 resolve(null);
             }
+            else if (result.length == 0){
+                resolve(0);
+            }
             else {
-                resolve(result);
+                resolve(result.length);
             }
         });
     });
@@ -106,9 +109,10 @@ const selectPromise = (select, from, where)  => new Promise((resolve, reject) =>
         selectPromise('seq','memo','user_id=1')
             .then(value => {
                 console.log('value: ' + value);
-                console.log('value: ' + value.length);
+                console.log('value: ' + value);
+                delete_time ='2022-07-27 15:31:00';
                 //데이터 객체
-                var data = { user_id: user_id, seq: value.length, contents: contents, store: store, delete_time: delete_time };
+                var data = { user_id: user_id, seq: value, contents: contents, store: store, delete_time: delete_time };
 
                 createColumns(data, 'memo');
             });
