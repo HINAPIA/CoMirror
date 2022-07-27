@@ -32,7 +32,6 @@ client.on('message', function (topic, message) {
     }
 });
 
-var i = 0;
 var stt_stop = function () {
     console.log('call stt_stop');
     client.publish('stt_stop', "stop");

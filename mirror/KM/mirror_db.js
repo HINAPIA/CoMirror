@@ -56,7 +56,7 @@ var createColumns = function (data, table_name) {
 }
 
 
-const selectPromise = (select, from, where)  => new Promise((resolve, reject) => {
+const selectPromise = (select, from, where) => new Promise((resolve, reject) => {
 
     pool.getConnection(function (err, conn) {
         if (err) {
@@ -77,48 +77,46 @@ const selectPromise = (select, from, where)  => new Promise((resolve, reject) =>
                 console.log('select3 || SQL error');
                 resolve(null);
             }
-            else if (result.length == 0){
-                resolve(0);
+            else if (result.length == 0) {
+                resolve(result);
             }
             else {
-                resolve(result.length);
+                resolve(result);
             }
         });
     });
 });
-    // 사용자를 등록하는 함수
-    dbAccess.addUser = function (user_id, name) {
-        if (!pool) {
-            console.log('error');
-            return;
-        }
-        console.log('addUser call');
-
-        //데이터 객체로
-        var data = { user_id: user_id, name: name };
-        createColumns(data, 'user',);
+// 사용자를 등록하는 함수
+dbAccess.addUser = function (user_id, name) {
+    if (!pool) {
+        console.log('error');
+        return;
     }
+    console.log('addUser call');
 
-    // 메모 생성하는 함수
-    dbAccess.addMemo = function (user_id, contents, store, delete_time) {
-        if (!pool) {
-            console.log('error');
-            return;
-        }
-        console.log('addMemo call');
-        selectPromise('seq','memo','user_id=1')
-            .then(value => {
-                console.log('value: ' + value);
-                console.log('value: ' + value);
-                delete_time ='2022-07-27 15:31:00';
-                //데이터 객체
-                var data = { user_id: user_id, seq: value, contents: contents, store: store, delete_time: delete_time };
+    //데이터 객체로
+    var data = { user_id: user_id, name: name };
+    createColumns(data, 'user',);
+}
 
-                createColumns(data, 'memo');
-            });
+// 메모 생성하는 함수
+dbAccess.addMemo = function (user_id, contents, store, delete_time) {
+    if (!pool) {
+        console.log('error');
+        return;
     }
-    if (pool) {
-        dbAccess.addMemo(1, '안녕', 0, 1);
-    }
+    console.log('addMemo call');
+    selectPromise('seq', 'memo', 'user_id=1')
+        .then(value => {
+            console.log('value: ' + value);
+            //데이터 객체
+            var data = { user_id: user_id, seq: value.length, contents: contents, store: store, delete_time: delete_time };
 
-    module.exports = dbAccess;
+            createColumns(data, 'memo');
+        });
+}
+if (pool) {
+    dbAccess.addMemo(1, '안녕', 0, 1);
+}
+
+module.exports = dbAccess;
