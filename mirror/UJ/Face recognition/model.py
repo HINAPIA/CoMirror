@@ -1,4 +1,5 @@
 
+from asyncio.windows_events import NULL
 from numpy import load
 from numpy import expand_dims
 from sklearn.preprocessing import LabelEncoder
@@ -8,6 +9,7 @@ from random import choice
 import joblib
 from numpy import load
 from numpy import expand_dims
+from numpy import array
 from sklearn.metrics import accuracy_score
 import os
 
@@ -43,24 +45,56 @@ def user_check(embedding_file_name):
     #score_train = accuracy_score(trainy, yhat_train)
     # 요약
     #print('정확도: 훈련=%.3f' % (score_train*100))
-
+    count =[0 for i in range(100)]
     # 테스트 데이터셋에서 임의의 예제에 대한 테스트 모델
-    for i in range(20):
-        selection = choice([i for i in range(trainX.shape[0])])
-        random_face_pixels = trainX_faces[selection]
+    for i in range(19):
+        selection = i
         random_face_emb = trainX[selection]
-       # random_face_class = trainy[selection]
+        #random_face_class = trainy[selection]
         #random_face_name = out_encoder.inverse_transform([random_face_class])
         # 얼굴 예측
-        samples = expand_dims(random_face_emb, axis=0)
-        yhat_class = model.predict(samples)
-        yhat_prob = model.predict_proba(samples)
-        # 이름 얻기
+        sample = expand_dims(random_face_emb, axis=0)
+        yhat_class = model.predict(sample)
+        yhat_prob = model.predict_proba(sample)
+
         class_index = yhat_class[0]
         class_probability = yhat_prob[0,class_index] * 100
         predict_names = out_encoder.inverse_transform(yhat_class)
         print('예상: %s (%.3f)' % (predict_names[0], class_probability))
-       # print('실제값: %s' % random_face_name[0])
+        if (class_probability> 55):      
+            count[class_index]  =  count[class_index] + 1
+
+
+    if(max(count) > 10):
+        print(max(count))
+        maxIndex = count.index(max(count))
+        # 이름 얻기
+        class_index = yhat_class[0]
+        #class_probability = yhat_prob[0,maxIndex] * 100
+        class_list = [maxIndex]
+        #print(class_list.shape)      
+        predict_names = out_encoder.inverse_transform(class_list)
+        print('사용자: %s ' % (predict_names[0])) 
+        return  predict_names[0]
+    else:
+        print(max(count))
+        
+        return NULL
+
+   
+   
+
+
+
+
+
+ 
+    
+            
+   # predict_names = out_encoder.inverse_transform(yhat_class)
+   # print('예상: %s (%.3f)' % (predict_names[0], class_probability))
+    print(count) 
+
  
    
 

@@ -18,4 +18,8 @@ newTrainX, trainy = dataPreProcess.embedding(dataset_file_name)
 embedding_file_name = 'login-embeddings.npz'
 # 배열을 하나의 압축 포맷 파일로 저장
 numpy.savez_compressed(embedding_file_name, newTrainX, trainy )
-model.user_check(embedding_file_name)
+user = model.user_check(embedding_file_name)
+if(user):
+    print('%s님 환영 합니다.'% user)
+else :
+    print("등록된 사용자가 아닙니다")

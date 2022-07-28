@@ -19,7 +19,7 @@ def face_extractor(img):
 
     return cropped_face
 
-cam=cv2.VideoCapture(0)
+cam=cv2.VideoCapture(1)
 cam.set(cv2.CAP_PROP_FRAME_WIDTH, 500)
 cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
