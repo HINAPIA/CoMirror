@@ -1,5 +1,5 @@
 let dbAccess = {};
-
+require('date-utils');
 // mysql 모듈 불러오기
 var mysql = require('mysql');
 
@@ -8,7 +8,7 @@ var pool = mysql.createPool({
     connectionLimit: 10,
     host: 'localhost',
     user: 'root',
-    password: '1234',
+    password: '11111111',
     database: 'mirror_db',
     debug: false
 });
@@ -116,7 +116,9 @@ dbAccess.addMemo = function (user_id, contents, store, delete_time) {
         });
 }
 if (pool) {
-    dbAccess.addMemo(1, '안녕', 0, 1);
+    var newDate = new Date();
+    var time = newDate.toFormat('YYYY-MM-DD HH24:MI:SS');
+    dbAccess.addMemo(1, '안녕', 0, time);
 }
 
 module.exports = dbAccess;

@@ -15,3 +15,11 @@
     width: 100%;
     text-align: center;
 }
+
+#memoDiv{
+    position: absolute;
+    bottom: 230px;
+    width: 100%;
+    text-align: center;
+    visibility: hidden;
+}

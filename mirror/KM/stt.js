@@ -1,30 +1,32 @@
 
+/* Section1. mqtt 모듈 require 및 broker 연동 */
 const mqtt = require('mqtt')
-
-const options = {
+const options = {  //broker 연동 위한 옵션(브로커 IP 및 포트번호)
   host: '127.0.0.1',
   port: 1883
 };
-
 mqttClient = mqtt.connect(options);
 
-const recorder = require('node-record-lpcm16');
+
+/* Section2. stt client 및 stt에 사용될 recorder 준비 */
+const recorder = require('node-record-lpcm16'); // recoder 사용 위한 모듈 import
 
 // Imports the Google Cloud client library
-const speech = require('@google-cloud/speech');
+const speech = require('@google-cloud/speech'); // google-cloud client library
 
 console.log("stt start");
 
   // Creates a client
-const client = new speech.SpeechClient( {keyFilename: "stt.json"});
+const client = new speech.SpeechClient( {keyFilename: "stt.json"}); // stt client 생성 (stt.json : api key 파일)
 
 
+/* Section3. 녹음 파일 저장 설정 */
 const encoding='LINEAR16'; 
 //flac필요없이 잘만 되더라.
 const sampleRateHertz=16000; 
 const languageCode='ko-KR';
 
-const request = {
+const request = { // stt client 옵션으로 넣어줄 request
   config: {
     encoding: encoding,
     sampleRateHertz: sampleRateHertz,
@@ -90,28 +92,28 @@ let recording = recorder
   .pipe(recognizeStream);
 
   
-  mqttClient.subscribe('stt_stop');
+  // mqttClient.subscribe('stt_stop');
   
-  let exist = true;
+  // let exist = true;
 
-  mqttClient.on('message', function(topic, message){
-      if(topic.toString() == 'stt_stop'){
-        if(exist==true){
-          exist=false;
-          console.log(recording+'\n');
-          recording.stop();
-          console.log(recording+'\n');
-          console.log("stop");
-        }
-        else if(exist==false){
-          exist=true;
-          recording.stream().on('error', console.error)
-          .pipe(recognizeStream);
-          console.log('start');
-        }
+  // mqttClient.on('message', function(topic, message){
+  //     if(topic.toString() == 'stt_stop'){
+  //       if(exist==true){
+  //         exist=false;
+  //         console.log(recording+'\n');
+  //         recording.stop();
+  //         console.log(recording+'\n');
+  //         console.log("stop");
+  //       }
+  //       else if(exist==false){
+  //         exist=true;
+  //         recording.stream().on('error', console.error)
+  //         .pipe(recognizeStream);
+  //         console.log('start');
+  //       }
         
-      }
-  });
+  //     }
+  // });
 
 
 
