@@ -1,6 +1,18 @@
 const key = 'c4210b6e0e1aba39c98584f4f2a64f0d'
 let city = 'seoul'
 
+let weatherIcon ={
+    '01' : 'wi wi-day-sunny',
+    '02' : 'wi wi-day-cloudy',
+    '03' : 'wi wi-cloud',
+    '04' : 'wi wi-cloudy',
+    '09' : 'wi wi-showers',
+    '10' : 'wi wi-day-rain',
+    '11' : 'wi wi-thunderstorm',
+    '13' : 'wi wi-snow',
+    '50' : 'wi-fog'
+};
+
 const callback = function(err, data) {
     if(err !== null) {
     alert('예상치 못한 오류 발생.' + err);
@@ -14,15 +26,15 @@ const callback = function(err, data) {
         let wind_speed = data.wind.wind_speed;
         let clouds = data.clouds.all;
 
-        var currentIcon = document.getElementById("weatherIcon");
-        var icon = data.weather[0].icon;
-        var iconImg = `http://openweathermap.org/img/wn/${icon}@2x.png`;
+        var iconValue = (data.weather[0].icon).substr(0,2);
+        let icon = document.createElement('i');
+        icon.className = weatherIcon[iconValue];
+
+        document.getElementById("CurrIcon").append(icon);
 
         var currentDiv = document.getElementById("weather");
-        
-        currentDiv.innerText = `${temperature} °C / ${humidity}% / ${data.weather[0].description}`;
-        currentIcon.setAttribute('src', iconImg);
-
+        document.getElementById("temp").innerText = `${Math.round(temperature) } `;
+        currentDiv.innerText = `${data.weather[0].description}`;
     }
 }
 

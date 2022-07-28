@@ -1,14 +1,15 @@
 let dbAccess = {};
-require('date-utils');
+
 // mysql 모듈 불러오기
 var mysql = require('mysql');
+require('date-utils')
 
 // 연결 설정
 var pool = mysql.createPool({
     connectionLimit: 10,
     host: 'localhost',
     user: 'root',
-    password: '11111111',
+    password: '1234',
     database: 'mirror_db',
     debug: false
 });
@@ -86,6 +87,9 @@ const selectPromise = (select, from, where) => new Promise((resolve, reject) => 
         });
     });
 });
+
+dbAccess.select = selectPromise;
+
 // 사용자를 등록하는 함수
 dbAccess.addUser = function (user_id, name) {
     if (!pool) {
@@ -100,7 +104,7 @@ dbAccess.addUser = function (user_id, name) {
 }
 
 // 메모 생성하는 함수
-dbAccess.addMemo = function (user_id, contents, store, delete_time) {
+dbAccess.addMemo = function (user_id, contents, store) {
     if (!pool) {
         console.log('error');
         return;
@@ -109,16 +113,18 @@ dbAccess.addMemo = function (user_id, contents, store, delete_time) {
     selectPromise('seq', 'memo', 'user_id=1')
         .then(value => {
             console.log('value: ' + value);
-            //데이터 객체
-            var data = { user_id: user_id, seq: value.length, contents: contents, store: store, delete_time: delete_time };
+            var newDate = new Date();
+            var time = newDate.toFormat('YYYY-MM-DD HH24:MI:SS');
 
+            if(value.length==0)
+                value = value.length;
+            else
+                value = (value[value.length-1].seq)+1;
+
+            //데이터 객체
+            var data = { user_id: user_id, seq: value, contents: contents, store: store, delete_time: time };
             createColumns(data, 'memo');
         });
-}
-if (pool) {
-    var newDate = new Date();
-    var time = newDate.toFormat('YYYY-MM-DD HH24:MI:SS');
-    dbAccess.addMemo(1, '안녕', 0, time);
 }
 
 module.exports = dbAccess;
