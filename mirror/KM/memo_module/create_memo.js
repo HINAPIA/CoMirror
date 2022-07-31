@@ -1,11 +1,10 @@
 const dbAccess = require('./mirror_db.js')
 
+dbAccess.setUI();
+
 const mqtt = require('mqtt')
 
-let users = [{}];
-let currentMsg = "";
-
-document.getElementById("apply").addEventListener("click",submitMemo);
+document.getElementById("apply").addEventListener("click",setIsAddableDB);
 document.getElementById("cancle").addEventListener("click",setIsAddableDB);
 let ul = document.getElementById('otherUserList');
 
@@ -22,27 +21,26 @@ client.subscribe('create_memo');
 client.subscribe('memo_content');
 
 client.on('message', function (topic, message) {
-    
     if (topic.toString() == 'create_memo') {
-
         document.getElementById('callImg').style.visibility = "visible";
         document.getElementById("memoDiv").style.visibility = "hidden";
         document.getElementById("memo").innerHTML = '남길 메모를 말해주세요';
     }
     else if (topic.toString() == 'memo_content') {
         if (isAddableDB == true){ 
-            document.getElementById('callImg').style.visibility = "hidden";
-            document.getElementById('memoDiv').style.visibility = "visible";
-            document.getElementById("memo").innerHTML = `메모 내용: \"${message.toString()}\"`;
-            currentMsg = message.toString();
-            const user_id = 1;
-            const contents = message.toString();
-            const store = 1;
-            dbAccess.addMemo(user_id, contents, store);
-            isAddableDB = false;
+        document.getElementById('callImg').style.visibility = "hidden";
+        document.getElementById('memoDiv').style.visibility = "visible";
+        document.getElementById("memo").innerHTML = `메모 내용: \"${message.toString()}\"`;
+        currentMsg = message.toString();
+        const user_id = 1;
+        const contents = message.toString();
+        const store = 0;
+        dbAccess.addMemo(user_id, contents, store);
+        isAddableDB = false;
         }
     }
 });
+
 
 function setIsAddableDB(){
     isAddableDB = true;
@@ -50,6 +48,7 @@ function setIsAddableDB(){
     document.getElementById("memoDiv").style.visibility = "hidden";
     document.getElementById("memo").innerHTML = "";
 }
+
 
 function insertOtherUserDB(user){
     let contents = currentMsg;
@@ -84,4 +83,3 @@ function showOtherUsers(){
         ul.appendChild(li);
     }
 }
-
