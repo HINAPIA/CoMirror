@@ -1,4 +1,4 @@
-// 모듈 사용할 객체
+/* 모듈 사용할 객체 */
 let dbAccess = {};
 
 // mirror 사용자 id
@@ -11,7 +11,7 @@ var mysql = require('mysql');
 var MySQLEvents = require('mysql-events');
 require('date-utils');
 
-// 연결 설정
+/* 연결 설정 */
 var pool = mysql.createPool({
     connectionLimit: 10,
     host: 'localhost',
@@ -21,7 +21,7 @@ var pool = mysql.createPool({
     debug: false
 });
 
-// 테이블 columns 제작 (insert 문)
+/* 테이블 columns 제작 (insert 문) */
 var createColumns = function (data, table_name) {
     console.log('insert || createColumns call');
     const createPromise = new Promise((resolve, reject) => {
@@ -70,7 +70,7 @@ var createColumns = function (data, table_name) {
     return;
 }
 
-// 테이블 columns 찾기 (select 문)
+/* 테이블 columns 찾기 (select 문) */
 const selectColumns = (select, from, where) => new Promise((resolve, reject) => {
     console.log('select || selectColumns call');
 
@@ -119,7 +119,7 @@ const selectColumns = (select, from, where) => new Promise((resolve, reject) => 
 // 모듈로 selectColumns도 사용 하기 위해 dbAccess에 추가
 dbAccess.select = selectColumns;
 
-// 사용자를 등록하는 함수 (user table에 새로운 columns insert)
+/* 사용자를 등록하는 함수 (user table에 새로운 columns insert) */
 dbAccess.addUser = function (user_id, name) {
     // db 연결 설정이 제대로 안됐을 경우 
     if (!pool) {
@@ -135,7 +135,7 @@ dbAccess.addUser = function (user_id, name) {
     createColumns(data, 'user',);
 }
 
-// 메모 생성하는 함수 (memo table에 새로운 columns insert)
+/* 메모 생성하는 함수 (memo table에 새로운 columns insert) */
 dbAccess.addMemo = function (user_id, contents, store) {
     // db 연결 설정이 제대로 안됐을 경우 
     if (!pool) {
@@ -165,7 +165,8 @@ dbAccess.addMemo = function (user_id, contents, store) {
                 value = (value[value.length - 1].seq) + 1;
 
             // memo_ui 추가
-            add_memo_ui(contents, value);
+            //add_memo_ui(contents, value);
+            
             // memo table 제작에 필요한 column을 데이터 객체로 형성
             var data = { user_id: user_id, seq: value, contents: contents, store: store, delete_time: time };
             // memo 행 제작
@@ -174,65 +175,6 @@ dbAccess.addMemo = function (user_id, contents, store) {
 }
 
 
-// mysql의 행의 변화(삭제, 삽입, 수정)가 생겼을 때 이벤트 처리 기능
-var MySQLEvents = require('mysql-events');
-// 데이터베이스 연결
-var dsn = {
-    host: 'localhost',
-    user: 'root',
-    password: '1234',
-};
-var mysqlEventWatcher = MySQLEvents(dsn);
-// watcher 은 감시자
-var watcher = mysqlEventWatcher.add(
-    // mirror_db라는 DB에서 memo라는 테이블의 변화가 생겼을 때를 감지하게 설정
-    'mirror_db.memo',
-    function (oldRow, newRow, event) {
-        // 행이 삽입됬을 때 호출
-        if (oldRow === null) {
-            // dbAccess.setUI();
-            // memo_ui.load(location.href+" "+memo_ui);
-            // location.reload();
-        }
 
-        // 행이 삭제됬을 때 호출
-        if (newRow === null) {
-            console.log('delete');
-            dbAccess.setUI();
-            //memo_ui.load(location.href+memo_ui);
-            location.reload();
-        }
-    },
-    'Active'
-);
-
-
-/* 메모 ui를 형성 */
-
-// memo ui를 자식 요소로 삽입할 class
-const memo_ui = document.getElementsByClassName('memo_ui');
-
-// 전체 memo ui 설정
-dbAccess.setUI = function () {
-    // 기존에 memo_ui 모두 삭제
-    memo_ui[0].innerHTML = "";
-
-    // memo전체를 select 문으로 가져와 contents를 ui로 띄우기
-    selectColumns('*', 'memo', `user_id=${userId}`)
-        .then(value => {
-            for (let i = 0; i < value.length; i++) {
-                add_memo_ui(value[i].contents, value[i].seq);
-            }
-        });
-}
-
-//content, seq를 받아 memo ui 생성 함수 
-const add_memo_ui = function (content, seq) {
-    const memo = document.createElement('div');
-    memo.id = seq;
-    memo.innerText = content;
-    memo_ui[0].append(memo);
-}
-
-// dbAccess 객체를 모듈화
+/* dbAccess 객체를 모듈화 */
 module.exports = dbAccess;

@@ -3,8 +3,6 @@
 const dbAccess = require('./mirror_db.js')
 const mqtt = require('mqtt')
 
-dbAccess.setUI();
-
 
 /* Section2. 변수 초기화 및 이벤트 리스너 추가 */
 
