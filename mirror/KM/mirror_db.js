@@ -1,24 +1,21 @@
-// 모듈 사용할 객체
 let dbAccess = {};
 let userId = 1;
 // mysql 모듈 불러오기
 var mysql = require('mysql');
-var MySQLEvents = require('mysql-events');
-require('date-utils');
-
+require('data-utils');
 // 연결 설정
 var pool = mysql.createPool({
     connectionLimit: 10,
     host: 'localhost',
     user: 'root',
-    password: '1234',
+    password: '11111111',
     database: 'mirror_db',
     debug: false
 });
 
-// 테이블 columns 제작 (insert 문)
+// columns 생성
 var createColumns = function (data, table_name) {
-    console.log('insert || createColumns call');
+    console.log('createColumns call');
 
     const createPromise = new Promise((resolve, reject) => {
         // 커넥션 풀에 연결 객체 가져오기
@@ -30,15 +27,15 @@ var createColumns = function (data, table_name) {
                 reject(err);
 
             }
-            console.log("insert || data base connected id: " + conn.threadId);
+            console.log("data base connected id: " + conn.threadId);
 
             //sql문 실행
             var exec = conn.query(`insert into ${table_name} set ?`, data, function (err, result) {
                 conn.release(); // 반드시 해제 해야함
-                console.log('insert || sql : ' + exec.sql);
+                console.log('sql : ' + exec.sql);
 
                 if (err) {
-                    console.log('insert || SQL error');
+                    console.log('SQL error');
                     reject(err);
                 }
                 resolve(result);
@@ -48,9 +45,9 @@ var createColumns = function (data, table_name) {
     createPromise
         .then(value => {
             if (value)
-                console.log('insert || insert Success');
+                console.log('insert');
             else
-                console.log('insert || insert Fail');
+                console.log('insert fail');
         })
         .catch(err => {
             console.log(err.stack);
@@ -58,42 +55,41 @@ var createColumns = function (data, table_name) {
     return;
 }
 
-// 테이블 columns 찾기 (select 문)
-const selectColumns = (select, from, where) => new Promise((resolve, reject) => {
-    console.log('select || selectColumns call');
+
+const selectPromise = (select, from, where) => new Promise((resolve, reject) => {
+
     pool.getConnection(function (err, conn) {
         if (err) {
             if (conn) {
                 conn.release();
             }
             reject(err);
+            //promise.reject(err);
         }
-        console.log("select || data base connected id: " + conn.threadId);
+        console.log("select2 || data base connected id: " + conn.threadId);
 
         //sql문 실행
         var exec = conn.query(`select ${select} from ${from} where ${where}`, function (err, result) {
             conn.release(); // 반드시 해제 해야함
-            console.log('select || sql : ' + exec.sql);
+            console.log('select3 || sql : ' + exec.sql);
 
             if (result.length < 0) {
-                console.log('select || SQL error');
+                console.log('select3 || SQL error');
                 resolve(null);
             }
             else if (result.length == 0) {
-                console.log('select || select zero');
                 resolve(result);
             }
             else {
-                console.log('select || select Success');
                 resolve(result);
             }
         });
     });
 });
 
-dbAccess.select = selectColumns;
+dbAccess.select = selectPromise;
 
-// 사용자를 등록하는 함수 (user table에 새로운 columns insert)
+// 사용자를 등록하는 함수
 dbAccess.addUser = function (user_id, name) {
     if (!pool) {
         console.log('error');
@@ -106,85 +102,29 @@ dbAccess.addUser = function (user_id, name) {
     createColumns(data, 'user',);
 }
 
-// 메모 생성하는 함수 (memo table에 새로운 columns insert)
+// 메모 생성하는 함수
 dbAccess.addMemo = function (user_id, contents, store) {
     if (!pool) {
         console.log('error');
         return;
     }
     console.log('addMemo call');
-    selectColumns('seq', 'memo',  `user_id=${user_id}`)
+    selectPromise('seq', 'memo', `user_id=${user_id}`)
         .then(value => {
-            // delete time 설정
+            console.log('value: ' + value);
             var newDate = new Date();
-            var time = newDate.toFormat('YYYY-MM-DD HH24:MI:SS');
+            // var time = newDate.toFormat('YYYY-MM-DD HH24:MI:SS');
 
-            if (value.length == 0)
+            if(value.length==0)
                 value = value.length;
             else
-                value = (value[value.length - 1].seq) + 1;
+                value = (value[value.length-1].seq)+1;
 
-            //add_memo_ui(contents, value);
             //데이터 객체
-            var data = { user_id: user_id, seq: value, contents: contents, store: store, delete_time: time };
+            var data = { user_id: user_id, seq: value, contents: contents, store: store, delete_time: "2022-07-28 18:02:02" };
             createColumns(data, 'memo');
         });
 }
-
-const memo_ui = document.getElementsByClassName('memo_ui');
-
-dbAccess.setUI = function () {
-    memo_ui[0].innerHTML = "";
-    selectColumns('*', 'memo', `user_id=${user_id}`)
-        .then(value => {
-            for (let i = 0; i < value.length; i++) {
-                add_memo_ui(value[i].contents, value[i].seq);
-            }
-        });
-}
-
-//insert 되면 ui 생성
-const add_memo_ui = function (content, seq) {
-    const memo = document.createElement('div');
-    memo.id = seq;
-    memo.innerText = content;
-    memo_ui[0].append(memo);
-}
-
-// delete되면 ui에서 삭제
-var MySQLEvents = require('mysql-events');
-// 데이터베이스 연결
-var dsn = {
-    host: 'localhost',
-    user: 'root',
-    password: '1234',
-};
-var mysqlEventWatcher = MySQLEvents(dsn);
-// watcher 은 감시자
-var watcher = mysqlEventWatcher.add(
-    'mirror_db',
-    function (oldRow, newRow, event) {
-        // 행 삽입
-        if (oldRow === null) {
-            // 여기에 코드 삽입
-            dbAccess.setUI();
-            //memo_ui.load(location.href+" "+memo_ui);
-            location.reload();
-        }
-
-        // 삭제된 행
-        if (newRow === null) {
-            console.log('delete');
-            dbAccess.setUI();
-            //memo_ui.load(location.href+memo_ui);
-            location.reload();
-            // 삭제 코드가 여기에 갑니다.
-        }
-    },
-    // ???
-    'Active'
-);
-
 
 dbAccess.userId = userId;
 
