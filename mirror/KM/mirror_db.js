@@ -1,15 +1,14 @@
 let dbAccess = {};
-
+let userId = 1;
 // mysql 모듈 불러오기
 var mysql = require('mysql');
-require('date-utils')
-
+require('data-utils');
 // 연결 설정
 var pool = mysql.createPool({
     connectionLimit: 10,
     host: 'localhost',
     user: 'root',
-    password: '1234',
+    password: '11111111',
     database: 'mirror_db',
     debug: false
 });
@@ -110,11 +109,11 @@ dbAccess.addMemo = function (user_id, contents, store) {
         return;
     }
     console.log('addMemo call');
-    selectPromise('seq', 'memo', 'user_id=1')
+    selectPromise('seq', 'memo', `user_id=${user_id}`)
         .then(value => {
             console.log('value: ' + value);
             var newDate = new Date();
-            var time = newDate.toFormat('YYYY-MM-DD HH24:MI:SS');
+            // var time = newDate.toFormat('YYYY-MM-DD HH24:MI:SS');
 
             if(value.length==0)
                 value = value.length;
@@ -122,9 +121,11 @@ dbAccess.addMemo = function (user_id, contents, store) {
                 value = (value[value.length-1].seq)+1;
 
             //데이터 객체
-            var data = { user_id: user_id, seq: value, contents: contents, store: store, delete_time: time };
+            var data = { user_id: user_id, seq: value, contents: contents, store: store, delete_time: "2022-07-28 18:02:02" };
             createColumns(data, 'memo');
         });
 }
+
+dbAccess.userId = userId;
 
 module.exports = dbAccess;

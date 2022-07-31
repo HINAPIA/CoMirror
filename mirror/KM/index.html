@@ -4,13 +4,13 @@
 <head>
     <title>ELECTRON EX</title>
     <meta charset="utf-8">
+    <!-- <link rel="stylesheet" href="bootstrap.css"> -->
     <link href="css/weather.css" rel="stylesheet">
     <link href="css/sticker.css" rel="stylesheet">
     <link href="css/weather-icons.min.css" rel="stylesheet">
 </head>
 
 <body>
-
     <br>
     <article id="container">
         <div class="weather_ui">
@@ -29,24 +29,23 @@
         <div id="memo">
         </div>
         <div id="memoDiv">
-            <input id= "apply" type="button" value="전송" onclick="">
-            <input id = "cancle" type="button" value="취소">
+            <input id= "apply" type="button" value="전송">
+            <input id = "cancle" type="button" value="닫기">
         </div>
+        <ul id="otherUserList">
+
+        </ul>
     </div>
 
-    <div id="sticker" onclick="f1()">
+    <div id="sticker">
         <img id="stickerImg" src="memo_module/img/sticker.png">
         <img id="callImg" src="memo_module/img/call.png">
     </div>
 
     <script type="module" src="app.js"></script>
-    <script>
-        const weather = require('./memo_module/create_memo.js');
-        function f1() {
-            //stt_stop();
-        }
-    </script>
-    <script src="./memo_module/sticker.js"></script>
+    <script type="module" src="./mirror_db.js"></script>
+    <script type="module" src="./memo_module/create_memo.js"></script>
+
 </body>
 
 </html>
