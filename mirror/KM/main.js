@@ -1,17 +1,18 @@
+//DISPLAY=:0 xrandr --output HDMI-1 --rotate right
 const { app, BrowserWindow } = require("electron");
 
 function createWindow() {
     let options = {
-    webPreferences: {
-        nodeIntegration: true,
-        contextIsolation: false,
-    },
-    backgroundColor:"#000000"
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+        },
+        backgroundColor: "#000000"
     }
     //options.fullscreen = true;
     //options.autoHideMenuBar = true;
     const win = new BrowserWindow(options);
-    
+
     //win.webContents.openDevTools();  
     win.loadFile("index.html");
 }

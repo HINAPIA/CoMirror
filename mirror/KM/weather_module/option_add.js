@@ -3,8 +3,8 @@ const f = require('fs');
 const weather = require('./weather');
 var file = './city.txt';
 var rl = readLine.createInterface({
-    input : f.createReadStream(file),
-    output : process.stdout,
+    input: f.createReadStream(file),
+    output: process.stdout,
     terminal: false
 });
 rl.on('line', function (text) {
