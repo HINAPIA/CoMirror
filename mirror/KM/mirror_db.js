@@ -174,7 +174,5 @@ dbAccess.addMemo = function (user_id, contents, store) {
         });
 }
 
-
-
 /* dbAccess 객체를 모듈화 */
 module.exports = dbAccess;

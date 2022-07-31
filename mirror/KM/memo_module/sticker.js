@@ -25,7 +25,7 @@ var watcher = mysqlEventWatcher.add(
         if (newRow === null) {
             console.log('delete');
             setUI();
-            memo_ui.load(location.href+memo_ui);
+            memo_ui.relo
             //location.reload();
         }
     },
