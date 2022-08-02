@@ -1,6 +1,10 @@
+// openweathermap API key
 const key = 'c4210b6e0e1aba39c98584f4f2a64f0d'
+
+// 날짜 설정
 let city = 'seoul'
 
+// weather icon을 다른 icon(erikflowers icon)으로 변경하기 위한 icon 배열
 let weatherIcon = {
     '01': 'wi wi-day-sunny',
     '02': 'wi wi-day-cloudy',
@@ -13,7 +17,8 @@ let weatherIcon = {
     '50': 'wi-fog'
 };
 
-const callback = function (err, data) {
+// 날씨 api json 파일 읽어와서 json 파일을 통해 날씨 정보 알아내기
+const setWeather = function (err, data) {
     if (err !== null) {
         alert('예상치 못한 오류 발생.' + err);
     } else {
@@ -45,13 +50,18 @@ const getJSON = function (url) {
     xhr.onload = function () {
         const status = xhr.status;
         if (status === 200) {
-            callback(null, xhr.response);
+            setWeather(null, xhr.response);
         } else {
-            callback(status, xhr.response);
+            setWeather(status, xhr.response);
         }
     };
     xhr.send();
 };
+
+const getWeather = function () {
+    console.log('getWeather');
+    getJSON('http://api.openweathermap.org/data/2.5/weather?q=' + city + '&appid=' + key + '&units=metric');
+}
 
 // //좌표를 물어보는 함수 
 // function askForCoords() {
@@ -77,11 +87,5 @@ const getJSON = function (url) {
 // }
 
 // askForCoords();
-
-
-const getWeather = function () {
-    console.log('getWeather');
-    getJSON('http://api.openweathermap.org/data/2.5/weather?q=' + city + '&appid=' + key + '&units=metric');
-}
 
 module.exports = getWeather();

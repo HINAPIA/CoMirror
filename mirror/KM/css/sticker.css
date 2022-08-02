@@ -1,7 +1,12 @@
+.blur_effect {
+    filter: blur(0px);
+}
+
 #sticker {
     position: absolute;
     right: 20px;
     bottom: 20px;
+    display:inline-block;
 }
 
 #stickerImg {
@@ -26,29 +31,39 @@
     text-align: center;
 }
 
-#memo {
-    position: absolute;
-    bottom: 250px;
-    width: 100%;
+#memo {   
+    width:40%;
+    height:100px;
+    line-height:100px;
+    font-size: 28px;
+    color: #FFF; 
+    margin: 0 auto;
     text-align: center;
+    border-radius: 10px; 
+    border: 2px solid white;
+    /* background-color: rgba(206, 198, 178, 0.26); */
+    visibility:hidden;
 }
 
+
 #memoDiv {
-    position: absolute;
+    /* position: absolute;
     bottom: 230px;
-    width: 100%;
+    width: 100%; */
+    margin-top:15px;
+    /* border: 2px solid blue; */
     text-align: center;
     visibility: hidden;
 }
 
-.memo_ui {
+#memo_ui {
     position: absolute;
     display: block;
     top: 300px;
     width: 100%;
 }
 
-.memo_ui div {
+#memo_ui div {
     display: inline-block;
     width: 20%;
     font-size: 20px;
@@ -58,19 +73,32 @@
     margin-bottom: 15px;
     border: 2px solid white;
     border-radius: 40px 40px 40px 40px;
-
     background-color: rgba(255, 253, 253, 0.058);
 }
 
-.memo_ui div:nth-child(n) {
+#memo_ui div:nth-child(n) {
     text-align: center;
     transform: translateX(-30%);
     margin-left: 10%;
     float: left;
 }
 
-.memo_ui div:nth-child(2n) {
+#memo_ui div:nth-child(2n) {
     margin-left: 30%;
     text-align: center;
     float: right;
+}
+
+input[type="button"]{
+    background-color: #353735;
+    border: 2px solid white;
+    color: white;
+    width:200px;
+    height:40px;
+    margin:10px;
+    border-radius: 10px 10px 10px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
 }

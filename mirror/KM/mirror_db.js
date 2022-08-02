@@ -8,7 +8,7 @@ dbAccess.userId = userId;
 
 // mysql 모듈 불러오기
 var mysql = require('mysql');
-var MySQLEvents = require('mysql-events');
+
 require('date-utils');
 
 /* 연결 설정 */
@@ -146,7 +146,7 @@ dbAccess.addMemo = function (user_id, contents, store) {
     console.log('addMemo call');
 
     // seq를 알아내기 위해 select문 실행 (seq = 해당 유저에 memo 개수로 user_id와 함께 primary key)
-    selectColumns('seq', 'memo',  `user_id=${user_id}`)
+    selectColumns('seq', 'memo', `user_id=${user_id}`)
         // selectColumns를 다끝내고 처리하기 위해 then 이용 (동기 처리)
         // value -> select해서 얻은 행을 RowDataPacket
         .then(value => {
@@ -155,7 +155,7 @@ dbAccess.addMemo = function (user_id, contents, store) {
             // 현재 시간 가져오기
             var newDate = new Date();
             // delecte_time 형식 지정
-            var time = newDate.toFormat('YYYY-MM-DD HH24:MI:SS'); 
+            var time = newDate.toFormat('YYYY-MM-DD HH24:MI:SS');
 
             // value.length가 0일 경우 memo가 하나도 없는 것이므로 value.length를 seq로 설정
             if (value.length == 0)
@@ -164,9 +164,6 @@ dbAccess.addMemo = function (user_id, contents, store) {
             else
                 value = (value[value.length - 1].seq) + 1;
 
-            // memo_ui 추가
-            //add_memo_ui(contents, value);
-            
             // memo table 제작에 필요한 column을 데이터 객체로 형성
             var data = { user_id: user_id, seq: value, contents: contents, store: store, delete_time: time };
             // memo 행 제작

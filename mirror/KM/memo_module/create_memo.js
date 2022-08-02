@@ -10,7 +10,7 @@ let currentMsg = ""; // 현재(전송할) 메시지
 let users = [{}]; // 다른 사용자 DB (User Table) 정보([{user_id, name}])
 let isAddableDB = true; // 메모를 DB에 추가할 수 있는지 여부
 let ul = document.getElementById('otherUserList'); // 전송할 사용자 목록
-
+let blurEffectObjs = document.getElementsByClassName("blur_effect");
 document.getElementById("apply").addEventListener("click",submitMemo); // 전송 버튼
 document.getElementById("cancle").addEventListener("click",setIsAddableDB); // 닫기 버튼
 
@@ -28,15 +28,22 @@ client.subscribe('memo_content'); // 토픽 구독(남길 메모 내용)
 
 client.on('message', function (topic, message) { // 메시지 받았을 때 callback
     if (topic.toString() == 'create_memo') { // 메모 생성 직후
+        
+        document.getElementById("memo").style.visibility = "visible";
         document.getElementById('callImg').style.visibility = "visible";
+        
+        document.getElementsByClassName("blur_effect")[0].style.filter =  "blur(5px)";     
+        
         document.getElementById("memoDiv").style.visibility = "hidden";
         document.getElementById("memo").innerHTML = '남길 메모를 말해주세요';
+        isAddableDB = true;
     }
     else if (topic.toString() == 'memo_content') { // 사용자가 남길 메모 말했을 때
         if (isAddableDB == true){ // DB에 넣을 수 있는지 여부 확인
            /* UI 설정 */
             document.getElementById('callImg').style.visibility = "hidden";
             document.getElementById('memoDiv').style.visibility = "visible";
+            document.getElementById("memo").style.visibility = "visible";
             document.getElementById("memo").innerHTML = `메모 내용: \"${message.toString()}\"`;
             
             /* 현재 user DB에 insert */
@@ -55,8 +62,11 @@ client.on('message', function (topic, message) { // 메시지 받았을 때 call
 
 function setIsAddableDB(){ // 메모를 DB에 추가할 수 있는지 여부 설정
     isAddableDB = true;
+    document.getElementsByClassName("blur_effect")[0].style.filter =  "blur(0px)";       
+        
     document.getElementById("memoDiv").style.visibility = "hidden";
     document.getElementById("memo").innerHTML = "";
+    document.getElementById("memo").style.visibility = "hidden";
 }
 
 
