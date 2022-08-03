@@ -3,6 +3,10 @@ const { app, BrowserWindow } = require("electron");
 
 function createWindow() {
     let options = {
+        // width: 1200,
+        // height: 1900,
+        // x: 0,
+        // y: 0,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
@@ -14,7 +18,7 @@ function createWindow() {
     const win = new BrowserWindow(options);
 
     //win.webContents.openDevTools();  
-    win.loadFile("index.html");
+    win.loadFile("initScreen.html");
 }
 
 app.whenReady().then(() => {

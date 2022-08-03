@@ -11,7 +11,7 @@ let users = [{}]; // 다른 사용자 DB (User Table) 정보([{user_id, name}])
 let isAddableDB = true; // 메모를 DB에 추가할 수 있는지 여부
 let ul = document.getElementById('otherUserList'); // 전송할 사용자 목록
 let blurEffectObjs = document.getElementsByClassName("blur_effect");
-document.getElementById("apply").addEventListener("click",submitMemo); // 전송 버튼
+document.getElementById("apply").addEventListener("click",submitMemo,{once:true}); // 전송 버튼
 document.getElementById("cancle").addEventListener("click",setIsAddableDB); // 닫기 버튼
 
 
@@ -33,7 +33,8 @@ client.on('message', function (topic, message) { // 메시지 받았을 때 call
         document.getElementById('callImg').style.visibility = "visible";
         
         document.getElementsByClassName("blur_effect")[0].style.filter =  "blur(5px)";     
-        
+        document.getElementsByClassName("blur_effect")[1].style.filter =  "blur(5px)";    
+
         document.getElementById("memoDiv").style.visibility = "hidden";
         document.getElementById("memo").innerHTML = '남길 메모를 말해주세요';
         isAddableDB = true;
@@ -47,11 +48,10 @@ client.on('message', function (topic, message) { // 메시지 받았을 때 call
             document.getElementById("memo").innerHTML = `메모 내용: \"${message.toString()}\"`;
             
             /* 현재 user DB에 insert */
-            const user_id = 1;
             const contents = message.toString();
             currentMsg = message.toString(); //..필요할까 고민...
             const store = 0; 
-            dbAccess.addMemo(user_id, contents, store);
+            dbAccess.addMemo(dbAccess.userId, null, contents, store);
             isAddableDB = false; // 전송이나 취소 버튼을 누를 때까지 db insert 못함
         }
     }
@@ -63,7 +63,7 @@ client.on('message', function (topic, message) { // 메시지 받았을 때 call
 function setIsAddableDB(){ // 메모를 DB에 추가할 수 있는지 여부 설정
     isAddableDB = true;
     document.getElementsByClassName("blur_effect")[0].style.filter =  "blur(0px)";       
-        
+    document.getElementsByClassName("blur_effect")[1].style.filter =  "blur(0px)";    
     document.getElementById("memoDiv").style.visibility = "hidden";
     document.getElementById("memo").innerHTML = "";
     document.getElementById("memo").style.visibility = "hidden";
@@ -98,7 +98,8 @@ function showOtherUsers(){
 // 선택한 사용자 DB에 메모 insert
 function insertOtherUserDB(user){ 
     let contents = currentMsg;
-    dbAccess.addMemo(user.user_id,contents,0); 
+    console.log('userName: '+dbAccess.userName);
+    dbAccess.addMemo(user.user_id,dbAccess.userName,contents,0); 
     currentMsg = "";
 
     while (ul.hasChildNodes()) { // UI 초기화

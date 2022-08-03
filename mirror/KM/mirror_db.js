@@ -119,6 +119,40 @@ const selectColumns = (select, from, where) => new Promise((resolve, reject) => 
 // 모듈로 selectColumns도 사용 하기 위해 dbAccess에 추가
 dbAccess.select = selectColumns;
 
+// mirror 사용자 이름
+let userName;
+selectColumns('name','user',`user_id=${userId}`)
+.then(value => {
+    userName = value[0].name;
+    console.log('userName1:'+userName);
+    // 모듈로 name도 사용 하기 위해 dbAccess에 추가
+    dbAccess.userName = userName;
+})
+
+dbAccess.seq = new Promise ((resolve, reject) => {
+
+    if (!pool) {
+        console.log('error');
+        return;
+    }
+    console.log('seq call');
+    dbAccess.select('user_id', 'user',"user_id is not null")
+    // selectColumns를 다끝내고 처리하기 위해 then 이용 (동기 처리)
+    // value -> select해서 얻은 행을 RowDataPacket
+    .then(value => {
+        // value.length가 0일 경우 memo가 하나도 없는 것이므로 value.length를 seq로 설정
+        if (value.length == 0)
+            value = value.length;
+        // 0이 아닐 경우 마지막 행의 seq 값의 + 1을 seq로 설정
+        else
+            value = (value[value.length - 1].user_id) + 1;
+        console.log('dv: ' + parseInt(value));
+
+        resolve(String(value));
+    });
+});
+
+
 /* 사용자를 등록하는 함수 (user table에 새로운 columns insert) */
 dbAccess.addUser = function (user_id, name) {
     // db 연결 설정이 제대로 안됐을 경우 
@@ -136,7 +170,7 @@ dbAccess.addUser = function (user_id, name) {
 }
 
 /* 메모 생성하는 함수 (memo table에 새로운 columns insert) */
-dbAccess.addMemo = function (user_id, contents, store) {
+dbAccess.addMemo = function (user_id, from, contents, store) {
     // db 연결 설정이 제대로 안됐을 경우 
     if (!pool) {
         console.log('error');
@@ -165,7 +199,7 @@ dbAccess.addMemo = function (user_id, contents, store) {
                 value = (value[value.length - 1].seq) + 1;
 
             // memo table 제작에 필요한 column을 데이터 객체로 형성
-            var data = { user_id: user_id, seq: value, contents: contents, store: store, delete_time: time };
+            var data = { user_id: user_id, seq: value, from:from, contents: contents, store: store, delete_time: time };
             // memo 행 제작
             createColumns(data, 'memo');
         });

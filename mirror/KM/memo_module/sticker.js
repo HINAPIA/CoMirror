@@ -1,10 +1,10 @@
 const dbAccess = require('./mirror_db.js')
 
-// memo ui를 자식 요소로 삽입할 class
-const memo_ui = document.getElementById('memo_ui');
-
-
 console.log('sticker.js || call');
+
+// memo ui를 자식 요소로 삽입할 class
+const myMemo = document.getElementById('myMemo');
+const sendMemo = document.getElementById('sendMemo');
 
 /* mysql의 행의 변화(삭제, 삽입, 수정)가 생겼을 때 이벤트 처리 기능 */
 var MySQLEvents = require('mysql-events');
@@ -50,23 +50,32 @@ const setUI = function () {
     dbAccess.select('*', 'memo', `user_id=${dbAccess.userId}`)
         .then(value => {
              // 기존에 memo_ui 모두 삭제
-            memo_ui.innerHTML = "";
+            myMemo.innerHTML = "";
+            sendMemo.innerHTML = "";
             for (let i = 0; i < value.length; i++) {
-                add_memo_ui(value[i].contents, value[i].seq);
+                add_memo_ui(value[i].contents, value[i].from);
             }
-
             // html에서 id memo_ui을 새로운 페이지로 변경(reload 비슷한 개념)
             // replace = 기존페이지를 새로운 페이지로 변경
-            location.replace(location.href + ' #memo_ui');
+            location.replace(location.href + '#memo_ui');
         })
 
 }
+
 //content, seq를 받아 memo ui 생성 함수 
-const add_memo_ui = function (content, seq) {
+const add_memo_ui = function (content, from) {
     const memo = document.createElement('div');
-    memo.id = seq;
     memo.innerText = content;
-    memo_ui.append(memo);
+    console.log('from ||' + from);
+    if(from == null)
+        myMemo.prepend(memo);
+    else{
+        sendMemo.prepend(memo);
+        const memoFrom = document.createElement('span');
+        memoFrom.innerText = `[  ` + from +` ]`;
+        sendMemo.prepend(memoFrom);
+    }
 }
+
 
 setUI();
