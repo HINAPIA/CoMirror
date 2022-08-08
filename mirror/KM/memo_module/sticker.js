@@ -109,6 +109,10 @@ const add_memo_ui = function (value) {
     memo.innerText = value.contents;
     memo.id = value.seq;
 
+    const cancleBtn = document.createElement('span');
+    cancleBtn.id = "cancleBtn";
+    memo.appendChild(cancleBtn);
+
     // store가 1일 경우 고정 아이콘 띄우기
     if (value.store == 1)
         addStoreIcon(memo);
