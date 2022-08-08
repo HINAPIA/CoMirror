@@ -168,10 +168,3 @@ input[type="button"]{
     display: inline-block;
     font-size: 20px;
 }
-
-#cancleBtn {
-    background-color: red;
-    width: 15px;
-    height: 15px;
-    float: right;
- }
