@@ -16,7 +16,7 @@ var pool = mysql.createPool({
 });
 
 /* 테이블 columns 제작 (insert 문) */
-var createColumns = function (data, table_name) {
+var createColumns = function (table_name, data) {
     console.log('insert || createColumns call');
     const createPromise = new Promise((resolve, reject) => {
         // 커넥션 풀에 연결 객체 가져오기
@@ -32,7 +32,7 @@ var createColumns = function (data, table_name) {
             console.log("insert || data base connected id: " + conn.threadId);
 
             //sql문 실행(insert문)
-            var exec = conn.query(`insert into ${table_name} set ?`, data, function (err, result) {
+            var exec = conn.query(`insert into ${table_name} values( ? )`, data, function (err, result) {
                 conn.release(); // 반드시 해제 해야함
                 console.log('insert || sql : ' + exec.sql);
 
@@ -166,40 +166,8 @@ var updateColumns = function (table_name, set, where) {
 dbAccess.update = updateColumns;
 
 
-// /* 사용자를 등록하는 함수 (user table에 새로운 columns insert) */
-// dbAccess.addUser2 = function (name) {
-//     // db 연결 설정이 제대로 안됐을 경우 
-//     if (!pool) {
-//         console.log('error');
-//         return;
-//     }
-//     console.log('addUser call');
-
-//     dbAccess.select('user_id', 'user', "user_id is not null")
-//         // selectColumns를 다끝내고 처리하기 위해 then 이용 (동기 처리)
-//         // value -> select해서 얻은 행을 RowDataPacket
-//         .then(value => {
-//             // value.length가 0일 경우 memo가 하나도 없는 것이므로 value.length를 seq로 설정
-//             if (value.length == 0)
-//                 value = value.length;
-//             // 0이 아닐 경우 마지막 행의 seq 값의 + 1을 seq로 설정
-//             else
-//                 value = (value[value.length - 1].user_id) + 1;
-//             console.log('dv: ' + parseInt(value));
-
-//             userId = value;
-//         })
-
-//     // user table 제작에 필요한 column을 데이터 객체로 형성
-//     var data = { user_id: user_id, name: name };
-
-//     // user 행 제작
-//     createColumns(data, 'user',);
-// }
-
-
 /* 사용자를 등록하는 함수 (user table에 새로운 columns insert) */
-dbAccess.addUser = function (user_id, name) {
+dbAccess.addUser = function (name) {
     // db 연결 설정이 제대로 안됐을 경우 
     if (!pool) {
         console.log('error');
@@ -207,13 +175,11 @@ dbAccess.addUser = function (user_id, name) {
     }
     console.log('addUser call');
 
-
-
     // user table 제작에 필요한 column을 데이터 객체로 형성
-    var data = { user_id: user_id, name: name };
+    var data = { name: name };
 
     // user 행 제작
-    createColumns(data, 'user',);
+    createColumns('user', data);
 }
 
 /* 메모 생성하는 함수 (memo table에 새로운 columns insert) */
@@ -226,30 +192,10 @@ dbAccess.addMemo = function (user_id, from, contents, store) {
 
     console.log('addMemo call');
 
-    // seq를 알아내기 위해 select문 실행 (seq = 해당 유저에 memo 개수로 user_id와 함께 primary key)
-    selectColumns('seq', 'memo', `user_id=${user_id}`)
-        // selectColumns를 다끝내고 처리하기 위해 then 이용 (동기 처리)
-        // value -> select해서 얻은 행을 RowDataPacket
-        .then(value => {
-
-            /* delete time 설정 */
-            // 현재 시간 가져오기
-            var newDate = new Date();
-            // delecte_time 형식 지정
-            var time = newDate.toFormat('YYYY-MM-DD HH24:MI:SS');
-
-            // value.length가 0일 경우 memo가 하나도 없는 것이므로 value.length를 seq로 설정
-            if (value.length == 0)
-                value = value.length;
-            // 0이 아닐 경우 마지막 행의 seq 값의 + 1을 seq로 설정
-            else
-                value = (value[value.length - 1].seq) + 1;
-
-            // memo table 제작에 필요한 column을 데이터 객체로 형성
-            var data = { user_id: user_id, seq: value, from: from, contents: contents, store: store, delete_time: time };
-            // memo 행 제작
-            createColumns(data, 'memo');
-        });
+    // memo table 제작에 필요한 column을 데이터 객체로 형성
+    var data = { user_id: user_id, from: from, contents: contents, store: store, delete_time: time };
+    // memo 행 제작
+    createColumns('memo', data);
 }
 
 // mirror 사용자 id
@@ -261,18 +207,23 @@ dbAccess.userId = userId;
 let userName;
 
 /* user id 설정과 user id에 따른 name 설정 */
-dbAccess.setUser= function(user_id) {
+dbAccess.setUser = function (user_id) {
     selectColumns('name', 'user', `user_id=${user_id}`)
-    .then(value => {
-        userName = value[0].name;
-        console.log('userName1:' + userName);
-        // 모듈로 name도 사용 하기 위해 dbAccess에 추가
-        dbAccess.userName = userName;
-    })
+        .then(value => {
+            userName = value[0].name;
+            console.log('userName1:' + userName);
+            // 모듈로 name도 사용 하기 위해 dbAccess에 추가
+            dbAccess.userName = userName;
+        })
 }
 
 dbAccess.setUser(userId);
 
 
+if (pool) {
+    dbAccess.addUser('KyungMi');
+}
+
 /* dbAccess 객체를 모듈화 */
 module.exports = dbAccess;
+
