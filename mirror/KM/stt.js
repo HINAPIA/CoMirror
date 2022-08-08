@@ -7,7 +7,6 @@ const options = {  //broker 연동 위한 옵션(브로커 IP 및 포트번호)
 };
 mqttClient = mqtt.connect(options);
 
-
 /* Section2. stt client 및 stt에 사용될 recorder 준비 */
 const recorder = require('node-record-lpcm16'); // recoder 사용 위한 모듈 import
 
