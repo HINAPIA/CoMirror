@@ -1,14 +1,8 @@
 /* 모듈 사용할 객체 */
 let dbAccess = {};
 
-// mirror 사용자 id
-let userId = 1;
-// 모듈로 userId도 사용 하기 위해 dbAccess에 추가
-dbAccess.userId = userId;
-
 // mysql 모듈 불러오기
 var mysql = require('mysql');
-
 require('date-utils');
 
 /* 연결 설정 */
@@ -21,59 +15,11 @@ var pool = mysql.createPool({
     debug: false
 });
 
+
 /* 테이블 columns 제작 (insert 문) */
-var createColumns = function (data, table_name) {
+const createColumns = (table_name, data) => new Promise((resolve, reject) => {
+
     console.log('insert || createColumns call');
-    const createPromise = new Promise((resolve, reject) => {
-        // 커넥션 풀에 연결 객체 가져오기
-        pool.getConnection(function (err, conn) {
-            if (err) {
-                if (conn) {
-                    conn.release();
-                }
-                // db연결 실패 함수 reject 호출
-                reject(err);
-
-            }
-            console.log("insert || data base connected id: " + conn.threadId);
-
-            //sql문 실행(insert문)
-            var exec = conn.query(`insert into ${table_name} set ?`, data, function (err, result) {
-                conn.release(); // 반드시 해제 해야함
-                console.log('insert || sql : ' + exec.sql);
-
-                // sql문 실행 중 error 발생
-                if (err) {
-                    console.log('insert || SQL error');
-                    // promise 실패 함수 reject 호출
-                    reject(err);
-                }
-                // sql문 실행 성공 
-                // promise 성공 함수 resolve 호출
-                resolve(result);
-            });
-        });
-    });
-    createPromise
-        // then -> promise가 resolve를 호출(성공)했을 때 실행
-        .then(value => {
-            // value는 sql문 실행 후 리턴 값 -> insert문: 성공, 실패로 값을 리턴
-            if (value)
-                console.log('insert || insert Success');
-            else
-                console.log('insert || insert Fail');
-        })
-        // then -> promise가 reject를 호출(실패)했을 때 실행
-        .catch(err => {
-            console.log(err.stack);
-        })
-    return;
-}
-
-/* 테이블 columns 찾기 (select 문) */
-const selectColumns = (select, from, where) => new Promise((resolve, reject) => {
-    console.log('select || selectColumns call');
-
     // 커넥션 풀에 연결 객체 가져오기
     pool.getConnection(function (err, conn) {
         if (err) {
@@ -82,79 +28,128 @@ const selectColumns = (select, from, where) => new Promise((resolve, reject) => 
             }
             // db연결 실패 함수 reject 호출
             reject(err);
+
         }
-        console.log("select || data base connected id: " + conn.threadId);
+        console.log("insert || data base connected id: " + conn.threadId);
 
-        //sql문 실행 (select 문)
-        var exec = conn.query(`select ${select} from ${from} where ${where}`, function (err, result) {
+        //sql문 실행(insert문)
+        var exec = conn.query(`insert into ${table_name} set ?`, data, function (err, result) {
             conn.release(); // 반드시 해제 해야함
-            console.log('select || sql : ' + exec.sql);
+            console.log('insert || sql : ' + exec.sql);
 
-            // result = sql문 실행 후 리턴 값 
-            // -> select문: select해서 얻은 행을 RowDataPacket으로 리턴
-            // result.length = 행의 개수
+            // sql문 실행 중 error 발생
+            if (err) {
+                console.log('insert || SQL error');
 
-            // 행이 0보다 작을 경우 = sql 문 에러
-            if (result.length < 0) {
-                console.log('select || SQL error');
+                console.log(err.stack);
                 // promise 실패 함수 reject 호출
-                resolve(null);
+                reject(err);
             }
-
-            // 행이 0이거나 0보다 클 경우 = sql 제대로 실행
-            else if (result.length == 0) {
-                console.log('select || select zero');
-                // promise 성공 함수 resolve 호출
-                resolve(result);
-            }
-            else {
-                console.log('select || select Success');
-                // promise 성공 함수 resolve 호출
-                resolve(result);
-            }
+            // sql문 실행 성공 
+            if (result)
+                console.log('insert || insert Success');
+            else
+                console.log('insert || insert Fail');
+            // promise 성공 함수 resolve 호출
+            resolve(result);
         });
-    });
+    })
+});
+
+// 모듈로 createColumns 사용 하기 위해 dbAccess에 추가
+dbAccess.createColumns = createColumns;
+
+
+/* sql문 실행 */
+const practiceSql = (sql) => new Promise((resolve, reject) => {
+
+    console.log('createColumns call');
+    // 커넥션 풀에 연결 객체 가져오기
+    pool.getConnection(function (err, conn) {
+        if (err) {
+            if (conn) {
+                conn.release();
+            }
+            // db연결 실패 함수 reject 호출
+            reject(err);
+
+        }
+        console.log("data base connected id: " + conn.threadId);
+
+        //sql문 실행
+        var exec = conn.query(sql, function (err, result) {
+            conn.release(); // 반드시 해제 해야함
+            console.log('SQL : ' + exec.sql);
+
+            // sql문 실행 중 error 발생
+            if (err) {
+                console.log('SQL error');
+
+                console.log(err.stack);
+                // promise 실패 함수 reject 호출
+                reject(err);
+            }
+            // sql문 실행 성공 
+            if (result)
+                console.log('SQL Success');
+            else
+                console.log('SQL Fail');
+            // promise 성공 함수 resolve 호출
+            resolve(result);
+        });
+    })
+});
+
+const selectColumns = (select, from, where) => new Promise((resolve, reject) => {
+    practiceSql(`select ${select} from ${from} where ${where}`)
+    .then(value => {
+        // sql문 실행 성공 
+        if (value)
+            console.log('select || select Success');
+        else
+            console.log('select || select Fail');
+        // promise 성공 함수 resolve 호출
+        resolve(value);
+    })
 });
 
 // 모듈로 selectColumns도 사용 하기 위해 dbAccess에 추가
 dbAccess.select = selectColumns;
 
-// mirror 사용자 이름
-let userName;
-selectColumns('name','user',`user_id=${userId}`)
-.then(value => {
-    userName = value[0].name;
-    console.log('userName1:'+userName);
-    // 모듈로 name도 사용 하기 위해 dbAccess에 추가
-    dbAccess.userName = userName;
-})
-
-dbAccess.seq = new Promise ((resolve, reject) => {
-
-    if (!pool) {
-        console.log('error');
-        return;
-    }
-    console.log('seq call');
-    dbAccess.select('user_id', 'user',"user_id is not null")
-    // selectColumns를 다끝내고 처리하기 위해 then 이용 (동기 처리)
-    // value -> select해서 얻은 행을 RowDataPacket
+const updateColumns = (table_name, set, where) => new Promise((resolve, reject) => {
+    practiceSql(`update ${table_name} set ${set} where ${where}`)
     .then(value => {
-        // value.length가 0일 경우 memo가 하나도 없는 것이므로 value.length를 seq로 설정
-        if (value.length == 0)
-            value = value.length;
-        // 0이 아닐 경우 마지막 행의 seq 값의 + 1을 seq로 설정
+        // sql문 실행 성공 
+        if (value)
+            console.log('update || update Success');
         else
-            value = (value[value.length - 1].user_id) + 1;
-        console.log('dv: ' + parseInt(value));
-
-        resolve(String(value));
-    });
+            console.log('update || update Fail');
+        // promise 성공 함수 resolve 호출
+        resolve(value);
+    })
 });
 
+// 모듈로 updateColumns도 사용 하기 위해 dbAccess에 추가
+dbAccess.update = updateColumns;
+
+const deleteColumns = (table_name, where) => new Promise((resolve, reject) => {
+    practiceSql(`DELETE FROM ${table_name} WHERE ${where}`)
+    .then(value => {
+        // sql문 실행 성공 
+        if (value)
+            console.log('delete || delete Success');
+        else
+            console.log('delete || delete Fail');
+        // promise 성공 함수 resolve 호출
+        resolve(value);
+    })
+});
+
+// 모듈로 updateColumns도 사용 하기 위해 dbAccess에 추가
+dbAccess.delete = deleteColumns;
 
 /* 사용자를 등록하는 함수 (user table에 새로운 columns insert) */
-dbAccess.addUser = function (user_id, name) {
+const addUser = (name) => new Promise((resolve, reject) => {
     // db 연결 설정이 제대로 안됐을 경우 
     if (!pool) {
         console.log('error');
@@ -163,11 +158,25 @@ dbAccess.addUser = function (user_id, name) {
     console.log('addUser call');
 
     // user table 제작에 필요한 column을 데이터 객체로 형성
-    var data = { user_id: user_id, name: name };
+    var data = { name: name };
 
     // user 행 제작
-    createColumns(data, 'user',);
-}
+    createColumns('user', data)
+        .then(result => {
+            if (result) {
+                selectColumns('user_id', 'user', `name='${name}'`)
+                    .then(value => {
+                        console.log('dv: ' + parseInt(value[value.length - 1].user_id));
+                        resolve(String(value[value.length - 1].user_id));
+                    });
+            }
+            else {
+                reject(null);
+            }
+        });
+});
+
+dbAccess.addUser = addUser;
 
 /* 메모 생성하는 함수 (memo table에 새로운 columns insert) */
 dbAccess.addMemo = function (user_id, from, contents, store) {
@@ -179,31 +188,40 @@ dbAccess.addMemo = function (user_id, from, contents, store) {
 
     console.log('addMemo call');
 
-    // seq를 알아내기 위해 select문 실행 (seq = 해당 유저에 memo 개수로 user_id와 함께 primary key)
-    selectColumns('seq', 'memo', `user_id=${user_id}`)
-        // selectColumns를 다끝내고 처리하기 위해 then 이용 (동기 처리)
-        // value -> select해서 얻은 행을 RowDataPacket
-        .then(value => {
+    /* delete time 설정 */
+    // 현재 시간 가져오기
+    var newDate = new Date();
+    // delecte_time 형식 지정
+    var time = newDate.toFormat('YYYY-MM-DD HH24:MI:SS');
 
-            /* delete time 설정 */
-            // 현재 시간 가져오기
-            var newDate = new Date();
-            // delecte_time 형식 지정
-            var time = newDate.toFormat('YYYY-MM-DD HH24:MI:SS');
-
-            // value.length가 0일 경우 memo가 하나도 없는 것이므로 value.length를 seq로 설정
-            if (value.length == 0)
-                value = value.length;
-            // 0이 아닐 경우 마지막 행의 seq 값의 + 1을 seq로 설정
-            else
-                value = (value[value.length - 1].seq) + 1;
-
-            // memo table 제작에 필요한 column을 데이터 객체로 형성
-            var data = { user_id: user_id, seq: value, from:from, contents: contents, store: store, delete_time: time };
-            // memo 행 제작
-            createColumns(data, 'memo');
-        });
+    // memo table 제작에 필요한 column을 데이터 객체로 형성
+    var data = { user_id: user_id, from: from, contents: contents, store: store, delete_time: time };
+    // memo 행 제작
+    createColumns('memo', data);
 }
+
+// mirror 사용자 id
+let userId = 1;
+// 모듈로 userId도 사용 하기 위해 dbAccess에 추가
+dbAccess.userId = userId;
+
+// mirror 사용자 이름
+let userName;
+
+/* user id 설정과 user id에 따른 name 설정 */
+dbAccess.setUser = function (user_id) {
+    dbAccess.userId = user_id;
+    selectColumns('name', 'user', `user_id=${user_id}`)
+        .then(value => {
+            userName = value[0].name;
+            console.log('userName1:' + userName);
+            // 모듈로 name도 사용 하기 위해 dbAccess에 추가
+            dbAccess.userName = userName;
+            console.log('setUSUser: '+userId+" | "+userName);
+            document.location.href='index.html'
+        })
+}
+
 
 /* dbAccess 객체를 모듈화 */
 module.exports = dbAccess;

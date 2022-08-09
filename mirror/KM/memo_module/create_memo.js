@@ -1,6 +1,6 @@
 /* Section1. 필요한 모듈 require */
 
-const dbAccess = require('./mirror_db.js')
+const dbAccess = require('../mirror_db.js')
 const mqtt = require('mqtt')
 
 

@@ -1,7 +1,9 @@
+/* weather.js */
+
 // openweathermap API key
 const key = 'c4210b6e0e1aba39c98584f4f2a64f0d'
 
-// 날짜 설정
+// 위치(도시) 설정
 let city = 'seoul'
 
 // weather icon을 다른 icon(erikflowers icon)으로 변경하기 위한 icon 배열
@@ -22,28 +24,23 @@ const setWeather = function (err, data) {
     if (err !== null) {
         alert('예상치 못한 오류 발생.' + err);
     } else {
-        let temperature = data.main.temp;
-        let feels_temp = data.main.feels_temp;
-        let humidity = data.main.humidity;
-        let temp_min = data.main.temp_min;
-        let temp_max = data.main.temp_max;
-
-        let wind_speed = data.wind.wind_speed;
-        let clouds = data.clouds.all;
-
         var iconValue = (data.weather[0].icon).substr(0, 2);
         let icon = document.createElement('i');
         icon.className = weatherIcon[iconValue];
 
         document.getElementById("CurrIcon").append(icon);
-
         var currentDiv = document.getElementById("weather");
-        console.log(iconValue);
-        document.getElementById("temp").innerText = `${Math.round(temperature)} `;
+
+        document.getElementById("temp").innerText = `${Math.round(data.main.temp)} `;
+        document.getElementById("temp_max").innerText = `${Math.round(data.main.temp_max)}`;
+        document.getElementById("temp_min").innerText = `/ ${Math.round(data.main.temp_min)}`;
+        document.getElementById("humidity").innerText = `${data.main.humidity}`;
+
         currentDiv.innerText = `${data.weather[0].description}`;
     }
 }
 
+// api url에서 json을 받아오는 코드
 const getJSON = function (url) {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
@@ -59,11 +56,13 @@ const getJSON = function (url) {
     xhr.send();
 };
 
+// openweathermap api 설정 
 const getWeather = function () {
     console.log('getWeather');
-    getJSON('http://api.openweathermap.org/data/2.5/weather?q=' + city + '&appid=' + key + '&units=metric');
+    getJSON('http://api.openweathermap.org/data/2.5/weather?q=' + city + '&appid=' + key + '&units=metric&lang=kr');
 }
 
+/*
 //좌표를 물어보는 함수 
 function askForCoords() {
     navigator.geolocation.getCurrentPosition(handleSuccess, handleError);
@@ -88,5 +87,6 @@ function handleError() {
 }
 
 askForCoords();
+*/
 
 module.exports = getWeather();

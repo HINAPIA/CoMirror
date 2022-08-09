@@ -7,8 +7,21 @@
     <link href="css/weather.css" rel="stylesheet">
     <link href="css/sticker.css" rel="stylesheet">
     <link href="css/weather-icons.min.css" rel="stylesheet">
-    <script src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <link href="css/clock.css" rel="stylesheet">
+    <script>
+        function setMemoDeleteBtn(e){
+            let deleteBtns = document.getElementsByClassName("memoDeleteBtn");
+
+            if (e.type == "dblclick" && deleteBtns.length != 0){
+                    for (let i=0;i<deleteBtns.length;i++)
+                        deleteBtns[i].style.visibility = "visible";
+            }
+            else if (e.type = "click" && deleteBtns.length != 0){
+                for (let i=0;i<deleteBtns.length;i++)
+                        deleteBtns[i].style.visibility = "hidden";
+            }
+        }
+    </script>
 </head>
 
 <body>
@@ -17,10 +30,21 @@
         <div class="weather_ui">
             <div id="CurrIcon"></div>
             <div id="temp"></div>
-            <i class="wi wi-celsius"></i>
-            <br>
-            <p id="weather"></p>
+            <i class="wi wi-degrees"></i>
+            <div id="weather_option">
+                
+                <div id="temp_max"></div><i class="wi wi-degrees"></i>
+                <div id="temp_min"></div><i class="wi wi-degrees"></i> <br>
+                <div id="humidity"></div> <i class="wi wi-humidity"></i>
+                <p id="weather"></p>
+            </div>    
+        </div><div id="clock_ui">
+            <div>
+                <span id="time"></span><span id="second"></span>
+            </div>
+            
         </div>
+
     </article>
 
     <div id="memo_ui" class="blur_effect">
@@ -42,14 +66,13 @@
 
 
     <div id="sticker">
-        <img id="stickerImg" src="memo_module/img/sticker.png">
+        <img id="stickerImg" ondblclick="setMemoDeleteBtn(event)" onclick="setMemoDeleteBtn(event)" src="memo_module/img/sticker.png">
         <img id="callImg" src="memo_module/img/call.png">
     </div>
     
     <script type="module" src="app.js"></script>
-    <script type="module" src="./mirror_db.js"></script>
-    <script type="module" src="./memo_module/create_memo.js"></script>
-    <script type="module" src="./memo_module/sticker.js"></script>
+    <script src = "clock.js"></script>
+    
 </body>
 
 </html>
