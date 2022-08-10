@@ -1,3 +1,8 @@
+const receivedData = location.href.split('?')[1];
+let mirrorDB = require('./mirror_db');
+mirrorDB.userId = receivedData;
+
+
 // 날씨 모듈 불러오기
 require('./weather_module/weather.js');
 

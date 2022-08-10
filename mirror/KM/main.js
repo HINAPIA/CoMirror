@@ -3,22 +3,22 @@ const { app, BrowserWindow } = require("electron");
 
 function createWindow() {
     let options = {
-        width: 1200,
-        height: 1900,
-        x: 0,
-        y: 0,
+        // width: 1200,
+        // height: 1900,
+        // x: 0,
+        // y: 0,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
         },
         backgroundColor: "#000000"
     }
-    options.fullscreen = true;
-    options.autoHideMenuBar = true;
+    //options.fullscreen = true;
+    //options.autoHideMenuBar = true;
     const win = new BrowserWindow(options);
 
     //win.webContents.openDevTools();  
-    win.loadFile("dd.html");
+    win.loadFile("index.html");
 }
 
 app.whenReady().then(() => {

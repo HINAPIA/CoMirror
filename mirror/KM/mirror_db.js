@@ -19,7 +19,7 @@ var pool = mysql.createPool({
 /* 테이블 columns 제작 (insert 문) */
 const createColumns = (table_name, data) => new Promise((resolve, reject) => {
 
-    console.log('insert || createColumns call');
+    console.log('SQL call');
     // 커넥션 풀에 연결 객체 가져오기
     pool.getConnection(function (err, conn) {
         if (err) {
@@ -28,7 +28,6 @@ const createColumns = (table_name, data) => new Promise((resolve, reject) => {
             }
             // db연결 실패 함수 reject 호출
             reject(err);
-
         }
         console.log("insert || data base connected id: " + conn.threadId);
 
@@ -218,7 +217,7 @@ dbAccess.setUser = function (user_id) {
             // 모듈로 name도 사용 하기 위해 dbAccess에 추가
             dbAccess.userName = userName;
             console.log('setUSUser: '+userId+" | "+userName);
-            document.location.href='index.html'
+            document.location.href=`index.html?${user_id}`
         })
 }
 
