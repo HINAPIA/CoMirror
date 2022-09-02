@@ -62,7 +62,7 @@ function showUserMirrorBook(){
         serachFriendDiv.style.visibility = "hidden";
         document.getElementById("inside-selected").style.visibility = "visible";
         document.getElementById("outside-selected").style.visibility = "hidden";
-        mirror_db.select('id, name','friend',`id=${mirror_db.getId()}`)
+        mirror_db.select('friend_id, name','friend',`id=${mirror_db.getId()}`)
         .then(value => { // users에 값 넣기
                 for (let k = 0; k < value.length; k++) {
                     let li = document.createElement("li");
@@ -74,13 +74,13 @@ function showUserMirrorBook(){
                     li.style.marginBottom = "5px";
                     li.style.fontWeight="bold";
                     li.style.fontSize="20px";
+                    li.value=value[k].friend_id;
                     let deleteBtn = document.createElement("input");
                     deleteBtn.style.float="right";
                     deleteBtn.value ="✕";
                     deleteBtn.style.marginRight = "20px";
                     deleteBtn.type = "button";
-                    deleteBtn.addEventListener("click",deleteUser);
-                    li.appendChild(deleteBtn);
+                    deleteBtn.addEventListener("click",e=>{deleteUser(e)});
                     const textNode = document.createTextNode(value[k].name);
                     const userImg = document.createElement("img");
                     userImg.setAttribute("src","./image/index/user.png");
@@ -91,6 +91,7 @@ function showUserMirrorBook(){
                     userImg.style.verticalAlign="middle";
                     li.appendChild(userImg);
                     li.appendChild(textNode);
+                    li.appendChild(deleteBtn);
                     ul.appendChild(li);
                 }   
             }
@@ -198,21 +199,26 @@ function addFriendDB(){
     }
 }
 
-function deleteUser(){
+function deleteUser(e){
+    delete_id = e.target.parentNode.value;
+    delete_name =e.target.previousSibling.nodeValue;
+    console.log(`delete_id = ${delete_id}`);
+    console.log(`delete_name = ${delete_name}`);
     if(delete_id != null){
         if (confirm(`'${delete_name}'님을 삭제 하시겠습니까?`)) {
             mirror_db.delete('friend', `id = ${mirror_db.getId()} && friend_id = ${delete_id}`)
             .then(value =>{
                 //테이블 갱신
-                $('#table-1 > tbody').empty();
+                showUserMirrorBook();
                 delete_id = null;
                 delete_name = null;
-                getUserInfo();
             })
             return;
         } else {
             return;
         }
     }
+    delete_id = null;
+    delete_name = null;
 }
 
