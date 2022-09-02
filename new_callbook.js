@@ -2,7 +2,7 @@
 /* Section1. 변수 및 모달 관련 */
 
 /* HTML UI */
-// let mirror_db = require('./mirror_db');
+let mirror_db = require('./mirror_db');
 let callBookBtn = document.getElementById("bar_callbook_button");
 let modal = document.getElementById('modal');
 let friendList = document.getElementById("friend-list");

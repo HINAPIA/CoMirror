@@ -53,6 +53,6 @@ axios.get(`http://localhost:9000/check/${mirrorDB.userId}`)
             // memo 제작
             // require('./memo_module/create_memo');
             // memo ui 설정
-            require('./memo_module/sticker');
+            //require('./memo_module/sticker');
         }
     );
