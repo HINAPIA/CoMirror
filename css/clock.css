@@ -1,0 +1,30 @@
+#clock_ui {
+    color: white;
+    height: 5vh;
+    width: 100%;
+    /* border: solid 2px yellow; */
+}
+
+#time {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-size: 4vh;
+}
+
+#date_ui {
+    transform: translateY(-0.8vh);
+    color: white;
+    height: 3vh;
+    width: 100%;
+    /* border: solid 2px rgb(255, 0, 111); */
+}
+
+#date {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* line-height: 1; */
+    font-size: 1.3vh;
+}
