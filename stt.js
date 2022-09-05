@@ -60,14 +60,14 @@ function stt(data) {
       mqttClient.publish('call_request', "call")
       return `받은 내용: ${value} -> 전화 호출\n`
     }
-    if (value.includes("메모")) {
+    else if (value.includes("메모")) {
       create_memo = 1;
       //publish('create_memo',"create");
       mqttClient.publish('create_memo', "create");
       return `받은 내용: ${value} -> 메모 호출\n`;
     }
 
-    if (value.includes("연락처")) {
+    else if (value.includes("연락처")) {
       mqttClient.publish('callbook_request', "callbook")
       return `받은 내용: ${value} ->  호출\n`
     }

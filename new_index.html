@@ -332,7 +332,7 @@ background-size: cover;
     
                 var evt = document.createEvent("MouseEvents");
                 evt.initMouseEvent("click", true, true, window,
-                0, x, y, x, y, false, false, false, false, 0, null);
+                0, x, y, 0, 0, false, false, false, false, 0, null);
                 var cb = document.elementFromPoint(0,0);
                 console.log("change (screenX, screenY)=" + evt.screenX + "," + evt.screenY)
                 window.dispatchEvent(evt);
