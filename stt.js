@@ -67,6 +67,11 @@ function stt(data) {
       return `받은 내용: ${value} -> 메모 호출\n`;
     }
 
+    if (value.includes("연락처")) {
+      mqttClient.publish('callbook_request', "callbook")
+      return `받은 내용: ${value} ->  호출\n`
+    }
+
     return `받은 내용: ${value} -> 메모를 호출하지 않음\n`;
   }
   else {
@@ -95,27 +100,6 @@ let recording = recorder
 recording.stream().on('error', console.error)
   .pipe(recognizeStream);
 
-  console.log('Listening, press Ctrl+C to stop.');
+console.log('Listening, press Ctrl+C to stop.');
 
-// mqttClient.subscribe('stt_stop');
 
-// let exist = true;
-
-// mqttClient.on('message', function(topic, message){
-//     if(topic.toString() == 'stt_stop'){
-//       if(exist==true){
-//         exist=false;
-//         console.log(recording+'\n');
-//         recording.stop();
-//         console.log(recording+'\n');
-//         console.log("stop");
-//       }
-//       else if(exist==false){
-//         exist=true;
-//         recording.stream().on('error', console.error)
-//         .pipe(recognizeStream);
-//         console.log('start');
-//       }
-
-//     }
-// });
