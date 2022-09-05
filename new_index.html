@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html ondblclick="clickevent(event)" onclick="f(event)">
 <head>
     <title>new_index</title>
     <meta charset="utf-8">
@@ -35,7 +35,27 @@
             callRefusalContainer.style = 'display: none'
         }
     </script>
+    <style>
+        /* 커스텀 커서 스타일 정의해주기 */
+.cursor {
+
+width: 3rem;
+height: 3rem;
+border: 2px solid var(--color-texta);
+border-radius: 50%;
+position: absolute;
+z-index: 1000;
+transform: translate(-50%, -50%);
+pointer-events: none;
+transition: all 0.3s ease;
+transition-property: background, transform;
+transform-origin: 100% 100%;
+backdrop-filter: sepia(20%);
+background-size: cover;
+}
+    </style>
 </head>
+<div class="cursor">ㅁ</div>
 <body>
     <article id="container">
         <div class="weather_ui">
@@ -292,7 +312,35 @@
 <script src="record_module/new_m_record.js"></script>
 <script src="memo_module/create_memo.js"></script>
 
-
+<script>
+    let mouseCursor = document.querySelector(".cursor");
+      //window 객체에 scroll & mouse 이벤트를 추가하고 cursor함수 실행되도록 함
+    //window.addEventListener("scroll", cursor);
+    window.addEventListener("click", cursor, true);
+    //mouseCursor.addEventListener('mousemove',changeCursor )
+      //커스텀 커서의 left값과 top값을 커서의 XY좌표값과 일치시킴
+    
+    
+            function clickevent(e) {
+                var ratio = screen.width/screen.height;
+                x= e.screenY
+                y= e.screenX
+    
+                mouseCursor.style.top = y + "px";
+                mouseCursor.style.left = x + "px";
+    
+    
+                var evt = document.createEvent("MouseEvents");
+                evt.initMouseEvent("click", true, true, window,
+                0, x, y, x, y, false, false, false, false, 0, null);
+                var cb = document.elementFromPoint(0,0);
+                console.log("change (screenX, screenY)=" + evt.screenX + "," + evt.screenY)
+                window.dispatchEvent(evt);
+            }
+            function f(e) {
+                console.log("(screenX, screenY)=" + e.screenX + "," + e.screenY)
+            }
+    </script>
 
 <script>
     //window.onload = initMessages()
