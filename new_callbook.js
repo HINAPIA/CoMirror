@@ -1,6 +1,6 @@
 
 /* Section1. 변수 및 모달 관련 */
-
+console.log("new_callbook에 들어옴")
 /* HTML UI */
 let mirror_db = require('./mirror_db');
 let callBookBtn = document.getElementById("bar_callbook_button");
@@ -45,10 +45,28 @@ closeBtn.addEventListener("click", e => {
     modalOff();
 })
 
+/* Section2. stt 위한 MQTT 사용 */
 
-/* Section2. 연락처 관련 동작 */
+/* mqtt 브로커 연결 및 topic subscribe */
+const options = { // 브로커 정보(ip, port)
+    host: '127.0.0.1',
+    port: 1883
+}
+
+const mqttClient = mqtt.connect(options) // mqtt broker 연결
+mqttClient.subscribe('callbook_request')
+
+mqttClient.on('message', function (topic, message) { // 메시지 받았을 때 callback
+    console.log("메시지 받았을 때 - 연락처")
+    if (topic.toString() == 'callbook_request') { // 전화 호출
+        modal.style = 'display: flex'
+        callBookBtn.click()
+    }
+})
+
+/* Section3. 연락처 관련 동작 */
 function showUserMirrorBook(){
-
+    console.log("연락처 클릭됨")
     modal.style.display="flex";
     modal.style.visibility = "visible";
     ul.innerHTML = "";
@@ -58,7 +76,7 @@ function showUserMirrorBook(){
     document.getElementById('add-friend-btn').style.display = "none";
    
     if(friendList.checked == true){
-        ul.style.display = "block";
+        ul.style.display = "block";                                                                                             
         serachFriendDiv.style.visibility = "hidden";
         document.getElementById("inside-selected").style.visibility = "visible";
         document.getElementById("outside-selected").style.visibility = "hidden";

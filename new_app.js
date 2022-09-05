@@ -1,6 +1,6 @@
 // 통화 모듈
 const callAccess = require('./call_module/call')
-
+require('./new_callbook')
 // 날씨 모듈 불러오기
 require('./weather_module/new_weather')
 
@@ -14,7 +14,6 @@ mirrorDB.setUser(receivedData)
     message.initMessages()
     require('./message_module/message_socket')
     require('./memo_module/memo')
-    require('./new_callbook')
 })
 
 require('./weather_module/new_weather');
@@ -56,3 +55,5 @@ axios.get(`http://localhost:9000/check/${mirrorDB.userId}`)
             //require('./memo_module/sticker');
         }
     );
+
+
