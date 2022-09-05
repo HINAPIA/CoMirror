@@ -17,7 +17,7 @@ const speech = require('@google-cloud/speech'); // google-cloud client library
 console.log("stt start");
 
 // Creates a client
-const client = new speech.SpeechClient({ keyFilename: "stt.json" }); // stt client 생성 (stt.json : api key 파일)
+const client = new speech.SpeechClient({ keyFilename: "mirror.json" }); // stt client 생성 (stt.json : api key 파일)
 
 
 /* Section3. 녹음 파일 저장 설정 */
