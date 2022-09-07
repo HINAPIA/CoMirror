@@ -311,6 +311,7 @@ background-size: cover;
 <!-- <script src="record_module/new_record.js"></script> -->
 <script src="record_module/new_m_record.js"></script>
 <script src="memo_module/create_memo.js"></script>
+<script src="message_module/message_icon.js"></script>
 
 <script>
     let mouseCursor = document.querySelector(".cursor");
@@ -342,85 +343,7 @@ background-size: cover;
             }
     </script>
 
-<script>
-    //window.onload = initMessages()
-    
-    var message_click_cnt = 0;
-    var message_option_container = document.getElementById("message_option_container");
-    
-    var text_option_button = document.getElementById("text_option_button");
-    var image_option_button = document.getElementById("image_option_button");
-    var record_option_button = document.getElementById("record_option_button");
 
-
-    var message_click_cnt = 0; // 하단 bar 의 메시지 아이콘 몇 번 눌렀는지 확인
-    var message_memo_container = document.getElementById("message_memo_container");
-
-
-
-    // 하단 bar 의 메시지 아이콘 눌렀을 때
-    function barMessage(){
-        console.log("barMessage click");
-        // message_click_cnt++;
-        if(message_memo_container.style.display=="none") message_memo_container.style.display = "block";
-        else message_memo_container.style.display = "none";
-    }
-
-    function showRecordContent(){
-        let record_container = document.getElementById("record_content");
-        record_container.style.display = "block";
-        console.log(select_content);
-    }
-
-    function showImageContent(){
-        
-    }
-
-    function showWrite(){
-        write_button.style.display = "none";
-        back_button.style.display = "block";
-
-        // 라디오 버튼 체크 확인
-        var radio = document.getElementsByName("option");
-        var sel_type = null;
-        for(var i=0;i<radio.length;i++){
-            if(radio[i].checked == true) sel_type = radio[i].value;
-        }
-
-        if(sel_type == "text"){
-            //
-        }
-        else if(sel_type == "image"){
-            showImageContent();
-        }
-        else { // sel_type == "record"
-            console.log(sel_type);
-            showRecordContent();
-        }
-    }
-
-    function showStore(){
-        write_button.style.display = "block";
-        back_button.style.display = "none";
-
-        // 라디오 버튼 체크 확인
-        var radio = document.getElementsByName("option");
-        var sel_type = null;
-        for(var i=0;i<radio.length;i++){
-            if(radio[i].checked == true) sel_type = radio[i].value;
-        }
-
-        if(sel_type == "text"){
-            //
-        }
-        else if(sel_type == "image"){
-            //
-        }
-        else { // sel_type == "record"
-            // record_store();
-        }
-    }
-</script>
 <script src="./node_modules/socket.io/client-dist/socket.io.js"></script>
 <script src="new_app.js"></script>
 </html>

@@ -72,6 +72,11 @@ function stt(data) {
       return `받은 내용: ${value} ->  호출\n`
     }
 
+    else if (value.includes("메시지")) {
+      mqttClient.publish('message_request', "message")
+      return `받은 내용: ${value} ->  호출\n`
+    }
+
     return `받은 내용: ${value} -> 메모를 호출하지 않음\n`;
   }
   else {
