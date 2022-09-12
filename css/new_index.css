@@ -1,11 +1,11 @@
 html {
-    transform: rotate(-90deg);
+    /* transform: rotate(-90deg);
     transform-origin: top left;
     position: absolute;
     top: 100%;
     left: 0;
     width: 100vh;
-    height: 100vw;
+    height: 100vw; */
 }
 
 .alert-container{
@@ -30,6 +30,13 @@ html {
     font-size: 1.3vh;
     text-shadow: 1px 1px 2px gray;
     color: white;
+}
+
+.alert-container #stt-alert {
+    width: 100%;
+    font-size: 1.5vh;
+    height: 50%;
+    transform: translateY(50%);
 }
 
 #bar_container {

@@ -19,8 +19,7 @@ const allRecordButton = document.getElementById('all-record-button')
 const absensceButton = document.getElementById('absensce-button')
 
 const sttRefusalContainer = document.getElementById('stt-refusal-container')
-const sttAlert = document.getElementById('stt-refusal-alert')
-const sttValue = document.getElementById('stt-value')
+const sttAlert = document.getElementById('stt-alert')
 
 const input = document.getElementById('room-input')
 const connectButton = document.getElementById('connect-button')
