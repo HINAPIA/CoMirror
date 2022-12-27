@@ -76,16 +76,16 @@ def get_embedding(model, face_pixels):
         # 임베딩을 갖기 위한 예측 생성
         yhat = model.predict(samples)        
         return yhat[0]
-
-def embedding(embeddingModel, file_dir):
+# 임베딩 모델과 사진과 클래스명이 들어있는 단일 압축 파일을 입력 받아서 (임베딩벡터값, 클래스명) 2개의 변수를 리턴
+def embedding(embeddingModel, face_dataset):
 
 	# 얼굴 데이터셋 불러오기
-	data = load(file_dir)
+	data = load(face_dataset)
 	trainX, trainy= data['arr_0'], data['arr_1']
 	print('불러오기: ', trainX.shape, trainy.shape)
 	
 	#model = load_model('facenet_keras.h5')
-		# 훈련 셋에서 각 얼굴을 임베딩으로 변환하기
+	# 훈련 셋에서 각 얼굴을 임베딩으로 변환하기
 	newTrainX = list()
 	for face_pixels in trainX:
 		embedding = get_embedding(embeddingModel, face_pixels)

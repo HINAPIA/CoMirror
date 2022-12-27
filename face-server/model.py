@@ -9,21 +9,22 @@ from sklearn.metrics import accuracy_score
 import os
 import os.path
 
-# 얼굴 판별
+# 얼굴 인식
 def user_check(embedding_file_name, mirror_id):
     pre_embedding_file= load(os.path.join('mirror', mirror_id, 'files','trainfaces-embeddings.npz'))
     label_y = pre_embedding_file['arr_1']
     # 얼굴 임베딩 파일 불러오기
     data = load(embedding_file_name)
-    trainX = data['arr_0']
+    testX = data['arr_0']
     # 입력 벡터 일반화
     in_encoder = Normalizer(norm='l2')
-    trainX = in_encoder.transform(trainX)
+    testX = in_encoder.transform(testX)
     # 목표 레이블 암호화
     out_encoder = LabelEncoder()
     out_encoder.fit(label_y)
 
-    # 모델 적합
+    #모델 적합
+    #모델 파일은 새로운 유저가 회원가입 시 갱신되며 만들어진다
     model_file = os.path.join('mirror',mirror_id,'files','model.pkl')
     if not os.path.isfile(model_file):
         print('모델이 없습니다')
@@ -35,12 +36,14 @@ def user_check(embedding_file_name, mirror_id):
     # 테스트 데이터셋에서 임의의 예제에 대한 테스트 모델
     for i in range(10):
         selection = i
-        random_face_emb = trainX[selection]
+        random_face_emb = testX[selection]
         #얼굴 예측
         sample = expand_dims(random_face_emb, axis=0)
+        # lable 값
         yhat_class = model.predict(sample)
+        # 정확도 값
         yhat_prob = model.predict_proba(sample)
-
+        #이름 얻기
         class_index = yhat_class[0]
         class_probability = yhat_prob[0,class_index] * 100
         predict_names = out_encoder.inverse_transform(yhat_class)

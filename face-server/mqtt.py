@@ -150,6 +150,7 @@ client.loop_start()
 
 
 while True :
+    #로그인 - 인식 시작
     if (login_flag):
         print('while - login')
         # 확인된 유저의 id 반환

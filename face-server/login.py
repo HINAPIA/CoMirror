@@ -19,7 +19,7 @@ def login(embeddingModel, mirror_id):
     savez_compressed(os.path.join('mirror',mirror_id, 'files','loginface.npz'), trainX, trainy)
     print(trainX.shape, trainy.shape)
 
-    newTrainX, trainy = embedding(embeddingModel,os.path.join('mirror',mirror_id, 'files','loginface.npz'))
+    newTrainX, trainy = embedding(embeddingModel, os.path.join('mirror',mirror_id, 'files','loginface.npz'))
     # 배열을 하나의 압축 포맷 파일로 저장
     savez_compressed(os.path.join('mirror',mirror_id, 'files','login-embeddings.npz'), newTrainX, trainy )
     user = user_check(os.path.join('mirror',mirror_id, 'files','login-embeddings.npz'),mirror_id)
