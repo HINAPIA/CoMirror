@@ -18,7 +18,7 @@ import joblib
 import os
 import os.path
 from sklearn.metrics import accuracy_score
-import random
+
 curDir = os.path.dirname(os.path.realpath(__file__))
 os.chdir(curDir)
 embeddingModel = load_model('facenet_keras.h5')
@@ -155,57 +155,27 @@ def user_check_PE(count, embedding_dataset, mirror_id):
 
 
 #reTrain_PE(embeddingModel, 400)
-
+mirror_id = str(400)
+embedding_dataset = os.path.join('dataPE',mirror_id, 'files','login-embeddings.npz')
+login_PE(embeddingModel, "400")
 
 #user_check_PE(embedding_dataset, "400")
 
 # 얼굴인식 모델 훈련 때 사용한 사진의 수, 데이터 측정을 반복 횟수, 몇 장을 랜덤으로 뽑을 건지 입력 받아서
 # 인식률과 분류율을 콘솔로 띄우고 파일로 저장하는 함수
 def class_probability_evaluation(train_cnt, repeat_cnt, select_cnt, mirror_id):
-    mirror_id = str(mirror_id)
     #분류율
-    class_prob_sum = 0
+    classification_rate = 0
     #인식률
-    recognition_prob_sum = 0
+    recognition_rate = 0
     #사용할 testset
     embedding_dataset = os.path.join('dataPE',mirror_id, 'files','login-embeddings.npz')
-    test_data = load(embedding_dataset)
-    testX, testY = test_data['arr_0'],  test_data['arr_1']
-    # 입력 벡터 일반화
-    in_encoder = Normalizer(norm='l2')
-    testX = in_encoder.transform(testX)
-    # 목표 레이블 암호화
-    out_encoder = LabelEncoder()
-    out_encoder.fit(testY)
     #사용할 얼굴인식 모델
     model_folder = os.path.join("dataPE",mirror_id,"files")
     model_name = "model"+str(train_cnt)+".pkl"
-    model = joblib.load(os.path.join(model_folder,model_name))
-    
+    model = os.path.join(model_folder,model_name)
+    if not os.path.isfile(model):
+        print('모델이 없습니다')
+        return
     #측정 시작    
-    for repeat_index in range(repeat_cnt):
-        # 중복 없이 select_cnt 값만큼 인덱스 뽑기
-        selection = random.sample(range(0,testX.shape[0]-1),select_cnt)
-        #뽑은 데이터 predict
-        yhat_test = model.predict(testX[selection])
-        predict_names = out_encoder.inverse_transform(yhat_test)
-        #인식률
-        score_test = accuracy_score(testY[selection], predict_names) 
-        score_probability =score_test*100
-        # 분류율
-        yhat_prob =list(map(max,model.predict_proba(testX[selection])))
-        class_probability = yhat_prob*100
-        class_probability_mean = sum(class_probability)/len(class_probability)*100
-        # end of select_cnt roof
-        print('[%d] train_cnt : %d |  select_cnt : %d | recognition_prob =%.3f , class_prob = %.3f' % (repeat_index, train_cnt,select_cnt, score_probability, class_probability_mean))
-        class_prob_sum += class_probability_mean
-        #인식률
-        recognition_prob_sum += score_probability
-    #측정 끝
-    print('##### 최종 recognition_prob_mean : %.3f | class_prob_mean : %.3f' %(recognition_prob_sum/repeat_cnt, class_prob_sum/repeat_cnt))
-       
-
-mirror_id = str(400)
-#embedding_dataset = os.path.join('dataPE',mirror_id, 'files','login-embeddings.npz')
-#login_PE(embeddingModel, "400")
-class_probability_evaluation(20, 10000, 1, 400)
+    for i in range(repeat_cnt):
