@@ -91,6 +91,7 @@ def reTrain_PE(embeddingModel, mirror_id):
 
 def login_PE(embeddingModel, mirror_id):
     
+    sum = 0
     # 현재 파일의 디렉토리 경로. 작업 파일 기준
     curDir = os.path.dirname(os.path.realpath(__file__))
     os.chdir(curDir)
@@ -106,10 +107,16 @@ def login_PE(embeddingModel, mirror_id):
     savez_compressed(os.path.join('dataPE',mirror_id, 'files','login-embeddings.npz'), newTrainX, trainy )
 
     embedding_dataset = os.path.join('dataPE',mirror_id, 'files','login-embeddings.npz')
-    user_check_PE(embedding_dataset, "400")
+    for i in range(100):
+        sum += user_check_PE(i, embedding_dataset, "400")
+
+    print('****최종 정확도****: %.3f' % (sum/100.0))
+    print()
+
 
 # 얼굴 인식
-def user_check_PE(embedding_dataset, mirror_id):
+def user_check_PE(count, embedding_dataset, mirror_id):
+    sum_class_probability = 0
     # pre_embedding_file= load(os.path.join('dataPE', mirror_id, 'files','trainfaces-embeddings.npz'))
     # label_y = pre_embedding_file['arr_1']
     # 얼굴 임베딩 파일 불러오기
@@ -136,19 +143,20 @@ def user_check_PE(embedding_dataset, mirror_id):
     score_test = accuracy_score(testY, predict_names)
     # 정확도 값
     yhat_prob = model.predict_proba(testX)
-    class_probability = yhat_prob[0] * 100
-    #print('예상: %s (%.3f)' % (predict_names[0], class_probability))
-
-    
+    class_probability = yhat_prob* 100
+   
     #test 데이터 갯수만큼 반복
     for i in range(testX.shape[0]):
-        print('실제 값: %s,  예측 값= %s' % (testY[i], predict_names[i]))
-    print('정확도: 테스트=%.3f' % (score_test*100))
+        sum_class_probability += class_probability[i].max()
+        print('실제 값: %s,  예측 값= %s, 분류 확률 = (%.3f)' % (testY[i], predict_names[i],class_probability[i].max()))
+    print('[%d]정확도: 인식률 mean=%.3f , 분류율 mean = %.3f' % (count, score_test*100, sum_class_probability/testX.shape[0]))
+    return score_test*100 
 
 
 
 #reTrain_PE(embeddingModel, 400)
-#login_PE(embeddingModel, "400")
 mirror_id = str(400)
 embedding_dataset = os.path.join('dataPE',mirror_id, 'files','login-embeddings.npz')
-user_check_PE(embedding_dataset, "400")
+login_PE(embeddingModel, "400")
+
+#user_check_PE(embedding_dataset, "400")
