@@ -9,7 +9,7 @@ from datetime import datetime
 
 # 미러 바뀔 때마다 수동으로 설정해줘야 한다
 mirror_id = 400
-broker_ip = "192.168.0.1" # 현재 이 컴퓨터를 브로커로 설정
+broker_ip = "localhost" # 현재 이 컴퓨터를 브로커로 설정
 
 
 new_account_flag = False
@@ -101,7 +101,7 @@ def on_message(client, userdata, msg):
         
 
 
-#broker_ip = "127.0.0.1"
+broker_ip = "127.0.0.1"
 print('broker_ip : ' + broker_ip)
 
 

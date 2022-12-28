@@ -87,7 +87,7 @@ def reTrain_PE(embeddingModel, mirror_id):
     numpy.savez_compressed(folder_path  + os.path.sep+'trainfaces-embeddings.npz', newTrainX, trainy )
     # 모델 학습
     model_fit_PE(folder_path  + os.path.sep+ 'trainfaces-embeddings.npz', mirror_id)
-    return True
+
 
 def login_PE(embeddingModel, mirror_id):
     

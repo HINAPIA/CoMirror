@@ -9,10 +9,10 @@ import os
 from keras.models import load_model
 import shutil
 
-embeddingModel = load_model('facenet_keras.h5')
+
 curDir = os.path.dirname(os.path.realpath(__file__))
 os.chdir(curDir)
-
+embeddingModel = load_model('facenet_keras.h5')
 
 create_account_flag = False
 login_flag = False

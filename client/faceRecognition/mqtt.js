@@ -7,14 +7,14 @@ const loading = require('./loading');
 var user_id = '';
 var name;
 
-const options = {
-  host: '192.168.0.2',
-  port: 1883
-};
 // const options = {
-//   host: '127.0.0.1',
+//   host: '192.168.0.2',
 //   port: 1883
 // };
+const options = {
+  host: '127.0.0.1',
+  port: 1883
+};
 
 
 function setUserId(id) {
