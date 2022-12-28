@@ -21,6 +21,7 @@ delete_login_flag = False
 close_flag = False
 stopFlag = False
 id = 0
+login_img_count = 20
 
 curDir = os.path.dirname(os.path.realpath(__file__))
     #curDir = '.' + os.path.sep + 'faceRecognition'
@@ -119,11 +120,12 @@ def getClient():
     return client
        
 def capture_for_login(dir_name):
+    global login_img_count
     # dir_name1 폴더안에 10장의 얼굴 이미지를 저장
-    saved_folder = camera.createCropImage('user', dir_name, 10)
+    saved_folder = camera.createCropImage('user', dir_name, login_img_count)
     # 사진 넘겨주기
     imagelist = camera.load_image(saved_folder)
-    for i in range(10) :
+    for i in range(login_img_count) :
         imageByte = imagelist.pop()    
         # 얼굴인식 서버에게 찍은 사진을 보냄
         client.publish('login', bytearray(str(mirror_id), 'utf-8')+imageByte)

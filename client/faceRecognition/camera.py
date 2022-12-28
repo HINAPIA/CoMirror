@@ -26,7 +26,7 @@ client.loop_start()
 
 osName = platform.system()
 #windows
-cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture(1)
 #Linux
 #cam = cv2.VideoCapture(cv2.CAP_V4L)
 
@@ -43,7 +43,7 @@ face_classifier = cv2.CascadeClassifier(
 def onCam():
     global cam
     if (cam == None):
-        cam = cv2.VideoCapture(0)
+        cam = cv2.VideoCapture(1)
         cam.set(cv2.CAP_PROP_FRAME_WIDTH, 500)
         cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
             # #리눅스

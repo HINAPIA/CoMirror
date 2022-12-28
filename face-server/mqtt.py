@@ -28,6 +28,7 @@ existUser = ''
 delete_id = ''
 user_id = 0
 count= 0
+login_img_count=20
 
 
 def on_connect(client, userdata, flag, rc):
@@ -85,11 +86,11 @@ def on_message(client, userdata, msg):
         # f = open('face' +  os.sep + 'login' + os.sep + 'user' + os.sep + str(count) +'.jpg','wb')
         # f.write(file)
         # print(type(file))
-
+        global login_img_count
         mirror_id = msg.payload[0:3].decode('utf-8')
         print('mirror_id: ' + mirror_id)
         file = msg.payload[3:]
-        count = (count +1)%10
+        count = (count +1)%login_img_count
         file_path = os.path.join('mirror', str(mirror_id),'login', 'user',str(count)+'.jpg')  
         f = open(file_path,'wb')
         f.write(file)
