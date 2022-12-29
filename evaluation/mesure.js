@@ -1,8 +1,6 @@
 const writeXlsxFile = require("write-excel-file/node");
 const fs = require("fs");
 
-// calculator-base.js
-
 class Mesure {
     
     constructor(cnt,type){
@@ -13,10 +11,10 @@ class Mesure {
     }
 
     putDepartureTime(time) {
-        departure_time.push(time);
+        this.departure_time.push(time);
     }
     putArrivalTime(time) {
-        arrival_time.push(time);
+        this.arrival_time.push(time);
     }
 
     write() {
@@ -48,23 +46,17 @@ class Mesure {
                     value:this.type
                 },
                 {
-                    type:Date,
-                    value: new Date(),
-                    format:"hh:mm:ss"
-                    // value:this.departure_time[i]
+                    type:String,
+                    value:`${this.departure_time[i].getHours().toString()}:${this.departure_time[i].getMinutes().toString()}:${this.departure_time[i].getSeconds().toString()}.${this.departure_time[i].getUTCMilliseconds().toString()}`
+                    
                 },
                 {
-                    type:Date,
-                    value: new Date(),
-                    format:"hh:mm:ss"
-                    // type:Date,
-                    // value:this.arrival_time[i]
-
+                    type:String,
+                    value:`${this.arrival_time[i].getHours().toString()}:${this.arrival_time[i].getMinutes().toString()}:${this.arrival_time[i].getSeconds().toString()}.${this.arrival_time[i].getUTCMilliseconds().toString()}`
                 },
                 {
                     type:Number,
-                    value:1
-                    // value:this.arrival_time[i] - this.departure_time[i]
+                    value:this.arrival_time[i] - this.departure_time[i]
                 }
             ]
 

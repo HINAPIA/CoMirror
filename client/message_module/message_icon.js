@@ -48,11 +48,11 @@ mqttClient.on('connect', function () {
 mqttClient.on('message', async (topic, message, packet) => {
     //로그인시 서버로부터 받은 메시지 저장 
     if (topic == `image`) {
-        endTime = new Date().getTime();
+        endTime = new Date();
         console.log(endTime - startTime);
     }
     if (topic == `audio`) {
-        endTime = new Date().getTime();
+        endTime = new Date();
         audioMesure.putArrivalTime(endTime)
         console.log(endTime - startTime);
     }
@@ -375,16 +375,16 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
                 let count = 0;
                 // 사진
                 const performEvalue = setInterval(function () { // 5초 후 실행
-                    if (count > loop) {
+                    if (count >= loop) {
                         clearInterval(performEvalue);
                     }
 
-                    startTime = new Date().getTime();
+                    startTime = new Date();
                     mqttClient.publish(`image`, JSON.stringify(buf));
 
                     console.log(count + ' : publish');
                     count++;
-                }, 1500)
+                }, 100)
             }
             else {
                 //서버로 메시지를 보내는 이벤트 publish
@@ -420,20 +420,20 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
                     }).then((buf) => {
 
                         let count = 0;
-                        // 사진
+                        // 오디오
                         const performEvalue = setInterval(function () { // 5초 후 실행
-                            if (count > loop) {
+                            if (count >= loop) {
                                 clearInterval(performEvalue);
                                 audioMesure.write()
                             }
 
-                            startTime = new Date().getTime();
+                            startTime = new Date();
                             audioMesure.putDepartureTime(startTime)
                             mqttClient.publish(`audio`, JSON.stringify(buf));
 
                             console.log(count + ' : publish');
                             count++;
-                        }, 1500)
+                        }, 100)
                     })
                 }
             }
