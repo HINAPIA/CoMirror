@@ -19,13 +19,6 @@ let customOption = false
 let customFriend = null
 
 // 성능평가 위한 변수/////////////////////////////////////////////////////////
-
-const PERFORM_EVALUATION = true
-const Measure = require("../../evaluation/measure")
-let audioMeasure = new Measure(20,"오디오")
-let imageMeasure = new Measure(20,"이미지")
-let textMeasure = new Measure(20,"텍스트")
-
 const mqtt = require('mqtt')
 const options = {  //broker 연동 위한 옵션(브로커 IP 및 포트번호)
     host: '127.0.0.1',
@@ -35,9 +28,14 @@ const options = {  //broker 연동 위한 옵션(브로커 IP 및 포트번호)
 let mqttClient = mqtt.connect(options);
 
 let loop = 20; // 1억
-let sum = 0;
 let startTime;
 let endTime;
+
+const PERFORM_EVALUATION = true
+const Measure = require("../../evaluation/measure")
+let audioMeasure = new Measure(loop,"오디오")
+let imageMeasure = new Measure(loop,"이미지")
+let textMeasure = new Measure(loop,"텍스트")
 
 
 mqttClient.on('connect', function () {
@@ -196,11 +194,50 @@ outside.addEventListener('change', showUserBook);
 shutter_button.addEventListener('click', () => {
     innerClient.publish('capture/camera', "start");
 });
-
+let i=0;
 function showSendModal() {
     inside_label.click()
     hideKeyboard();
-    console.log("showSendModal");
+    console.log("showSendModal"+i);
+
+    // if(i >= 5){
+    //     textMeasure.write()
+    // }
+
+    /*
+    if(i >= 3){
+        textMeasure.write()
+    }
+
+    else if (PERFORM_EVALUATION) {
+        i++;
+        textMeasure.startExp()
+
+        let count = 0;
+        var buf = {
+            sender:"1001",
+            receiver: "4004",
+            content: "오늘 저녁 뭐먹어?", //평균 바이트 문자열
+            type: 'text',
+            send_time: time
+        }
+        // 텍스트
+        const performEvalue = setInterval(function () { // 5초 후 실행
+            if (count >= loop) {
+                clearInterval(performEvalue);
+                textMeasure.endExp()
+            }
+
+            startTime = new Date();
+            textMeasure.putDepartureTime(startTime)
+            mqttClient.publish(`text`, JSON.stringify(buf));
+
+            console.log(count + ' : publish');
+            count++;
+        }, 100)
+    }
+    */
+
     MessageSenderView(null)
 }
 
@@ -363,6 +400,8 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
 
             if (PERFORM_EVALUATION) {
 
+                textMeasure.startExp()
+
                 let count = 0;
                 var buf = {
                     sender:"1001",
@@ -375,7 +414,7 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
                 const performEvalue = setInterval(function () { // 5초 후 실행
                     if (count >= loop) {
                         clearInterval(performEvalue);
-                        textMeasure.write()
+                        textMeasure.endExp()
                     }
 
                     startTime = new Date();
@@ -394,6 +433,8 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
             }
         }
         else if (type_check == "image") { // image 전송일 때
+
+            imageMeasure.startExp()
 
             let img = document.getElementById('msg-img')
             let c = document.createElement('canvas');
@@ -417,7 +458,7 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
                 const performEvalue = setInterval(function () {
                     if (count >= loop) {
                         clearInterval(performEvalue);
-                        imageMeasure.write()
+                        imageMeasure.endExp()
                     }
 
                     startTime = new Date();
@@ -438,6 +479,9 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
         }
         else { // audio 전송일 때
             if (PERFORM_EVALUATION) {
+
+                audioMeasure.startExp()
+
                 var reader = new FileReader(); // new_m_record.js에서 녹음한 blob 객체
                 var blob = record_obj.getBlob(); // 컨텐츠를 특정 Blob에서 읽어 옴
 
@@ -466,7 +510,7 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
                         const performEvalue = setInterval(function () { // 5초 후 실행
                             if (count >= loop) {
                                 clearInterval(performEvalue);
-                                audioMeasure.write()
+                                audioMeasure.endExp()
                             }
 
                             startTime = new Date();
