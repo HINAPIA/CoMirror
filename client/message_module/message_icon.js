@@ -414,7 +414,7 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
 
                 let count = 0;
                 // 사진
-                const performEvalue = setInterval(function () { // 5초 후 실행
+                const performEvalue = setInterval(function () {
                     if (count >= loop) {
                         clearInterval(performEvalue);
                         imageMeasure.write()
@@ -536,7 +536,7 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
                     let count = 0;
                     // 사진
                     const performEvalue = setInterval(function () { // 5초 후 실행
-                        if (count > loop) {
+                        if (count >= loop) {
                             clearInterval(performEvalue);
                         }
 
