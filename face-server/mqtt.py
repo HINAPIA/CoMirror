@@ -8,6 +8,9 @@ from createAccount import reTrain
 import os
 from keras.models import load_model
 import shutil
+import math
+import time
+
 
 
 curDir = os.path.dirname(os.path.realpath(__file__))
@@ -170,15 +173,27 @@ while True :
         delete_login_flag = False
         exist_flag = False
 
+    #얼굴인식 모델 학습 시작
     if (create_account_flag):
         print('while - createAccount')
         # 1은 pi 에서 받아온 유저아이디
+        start = time.time()       
         check = createAccoount(embeddingModel,mirror_id)
+        end = time.time()
+        print(f"{end - start:.5f} sec")
         client.publish(f'{mirror_id}/createAccount/check', user_id)
         create_account_flag = False
 
-    if(reTrain_flag):       
-        reTrain(embeddingModel, mirror_id)
+    if(reTrain_flag):
+        check_time = []
+        for i in range(10):
+            start = time.time()       
+            reTrain(embeddingModel, mirror_id)
+            end = time.time()
+            check_time.append(end - start)
+              
+        for i in range(10):
+            print(f"{check_time[i]:.5f}")  
         client.publish(f'{mirror_id}/reTrain/check', mirror_id)
         reTrain_flag = False
 

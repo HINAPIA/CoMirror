@@ -38,13 +38,13 @@ def load_dataset(directory):
 	X, y = list(), list()
 	# 클래스별로 폴더 열기
 	directory = directory + os.path.sep
-	print('directory : ' + directory)
+	#print('directory : ' + directory)
 	#directory : face\login\
 	for subdir in os.listdir(directory):
 		# 경로
 		path =os.path.join( directory , subdir ) + os.path.sep
 		# path: face\login\user\
-		print('path: ' + path)
+		#print('path: ' + path)
 		# 디렉토리에 있을 수 있는 파일을 건너뛰기(디렉토리가 아닌 파일)
 		if not os.path.isdir(path):
 			continue
@@ -54,7 +54,7 @@ def load_dataset(directory):
 		labels = [subdir for _ in range(len(faces))]
     
 		# 진행 상황 요약
-		print('>%d개의 예제를 불러왔습니다. 클래스명: %s' % (len(faces), subdir))
+		#print('>%d개의 예제를 불러왔습니다. 클래스명: %s' % (len(faces), subdir))
 		# 저장
 		X.extend(faces)
 		y.extend(labels)
@@ -67,7 +67,7 @@ def get_embedding(model, face_pixels):
       #  face_pixels = face_pixels.reshape(1, 160*160)
         face_pixels = face_pixels.astype('int32')
         # 채널 간 픽셀값 표준화(전역에 걸쳐)
-        print(face_pixels.shape)
+        #print(face_pixels.shape)
         mean, std = face_pixels.mean(), face_pixels.std()
         face_pixels = (face_pixels - mean) / std
         # 얼굴을 하나의 샘플로 변환
@@ -82,7 +82,7 @@ def embedding(embeddingModel, face_dataset):
 	# 얼굴 데이터셋 불러오기
 	data = load(face_dataset)
 	trainX, trainy= data['arr_0'], data['arr_1']
-	print('불러오기: ', trainX.shape, trainy.shape)
+	#print('불러오기: ', trainX.shape, trainy.shape)
 	
 	#model = load_model('facenet_keras.h5')
 	# 훈련 셋에서 각 얼굴을 임베딩으로 변환하기

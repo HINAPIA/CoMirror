@@ -225,8 +225,32 @@ def make_csv(file_name, field_name, datas):
 mirror_id = str(400)
 #embedding_dataset = os.path.join('dataPE',mirror_id, 'files','login-embeddings.npz')
 #login_PE(embeddingModel, "400")
+class_probability_evaluation(2, 10, 1, 400)
+class_probability_evaluation(2, 10, 2, 400)
+class_probability_evaluation(2, 10, 4, 400)
+class_probability_evaluation(2, 10, 10, 400)
+
+class_probability_evaluation(4, 10, 1, 400)
+class_probability_evaluation(4, 10, 2, 400)
+class_probability_evaluation(4, 10, 4, 400)
+class_probability_evaluation(4, 10, 10, 400)
+
+class_probability_evaluation(10, 10, 1, 400)
+class_probability_evaluation(10, 10, 2, 400)
+class_probability_evaluation(10, 10, 4, 400)
+class_probability_evaluation(10, 10, 10, 400)
 
 class_probability_evaluation(20, 10, 1, 400)
 class_probability_evaluation(20, 10, 2, 400)
-class_probability_evaluation(20, 10, 3, 400)
 class_probability_evaluation(20, 10, 4, 400)
+class_probability_evaluation(20, 10, 10, 400)
+
+class_probability_evaluation(30, 10, 1, 400)
+class_probability_evaluation(30, 10, 2, 400)
+class_probability_evaluation(30, 10, 4, 400)
+class_probability_evaluation(30, 10, 10, 400)
+
+class_probability_evaluation(40, 10, 1, 400)
+class_probability_evaluation(40, 10, 2, 400)
+class_probability_evaluation(40, 10, 4, 400)
+class_probability_evaluation(40, 10, 10, 400)

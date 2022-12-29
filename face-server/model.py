@@ -99,7 +99,7 @@ def model_fit(embedding_file_name, mirror_id):
     # 정확도 점수
     score_train = accuracy_score(trainy, yhat_train)
     # 요약
-    print('정확도: 훈련=%.3f' % (score_train*100))
+    #print('정확도: 훈련=%.3f' % (score_train*100))
 
     # 테스트 데이터셋에서 임의의 예제에 대한 테스트 모델
     for i in range(20):
@@ -116,5 +116,5 @@ def model_fit(embedding_file_name, mirror_id):
         class_index = yhat_class[0]
         class_probability = yhat_prob[0,class_index] * 100
         predict_names = out_encoder.inverse_transform(yhat_class)
-        print('예상: %s (%.3f)' % (predict_names[0], class_probability))
-        print('실제값: %s' % random_face_name[0])
+        #print('예상: %s (%.3f)' % (predict_names[0], class_probability))
+        #print('실제값: %s' % random_face_name[0])
