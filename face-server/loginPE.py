@@ -201,20 +201,21 @@ def class_probability_evaluation(train_cnt, repeat_cnt, select_cnt, mirror_id):
         class_prob_sum += class_probability_mean
         #인식률
         recognition_prob_sum += score_probability
+        # csv에 넣을 row data 생성
         data = [train_cnt, select_cnt, repeat_index, score_probability, class_probability_mean]
         datas.append(data)
     #측정 끝
     print('##### 최종 recognition_prob_mean : %.3f | class_prob_mean : %.3f' %(recognition_prob_sum/repeat_cnt, class_prob_sum/repeat_cnt))
-
-    # field_name = ['회원가입 사진 장 수', '로그인 사진 장 수', '로그인 회차', '인식률', '분류율']
-    field_name = ['train_cnt', 'sselect_cnt', 'repeat_index', 'score_probability', 'class_probability_mean']
-    make_csv('test.csv', field_name, datas)
+    data = ['','','',recognition_prob_sum/repeat_cnt, class_prob_sum/repeat_cnt]
+    datas.append(data)
+    field_name = ['회원가입 사진 장 수', '로그인 사진 장 수', '로그인 회차', '인식률', '분류율']
+    make_csv('face_recog.csv', field_name, datas)
 
 
 # csv 파일 생성
 def make_csv(file_name, field_name, datas):
     file_path = './csv/'+file_name
-    with open(file_path, 'w',encoding='utf-8') as f:
+    with open(file_path, 'a', newline='') as f:
         write = csv.writer(f)
         write.writerow(field_name)
         write.writerows(datas)
@@ -224,4 +225,11 @@ def make_csv(file_name, field_name, datas):
 mirror_id = str(400)
 #embedding_dataset = os.path.join('dataPE',mirror_id, 'files','login-embeddings.npz')
 #login_PE(embeddingModel, "400")
+<<<<<<< Updated upstream
 class_probability_evaluation(40, 10, 5, 400)
+=======
+class_probability_evaluation(20, 10, 1, 400)
+class_probability_evaluation(20, 10, 2, 400)
+class_probability_evaluation(20, 10, 3, 400)
+class_probability_evaluation(20, 10, 4, 400)
+>>>>>>> Stashed changes
