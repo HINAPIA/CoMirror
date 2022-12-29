@@ -10,7 +10,8 @@ const socket = require('../message_module/message_socket');
 let record_obj = require('../message_module/record/new_m_record');
 const dbAccess = require("../mirror_db");
 
-
+const Mesure = require("../../evaluation/mesure")
+let audioMesure = new Mesure(20,"오디오")
 
 let messageAccess = {} // 모듈 제작을 위한 변수
 
@@ -21,8 +22,6 @@ let customFriend = null
 
 // 성능평가 위한 변수/////////////////////////////////////////////////////////
 
-
-
 const PERFORM_EVALUATION = true
 const mqtt = require('mqtt')
 const options = {  //broker 연동 위한 옵션(브로커 IP 및 포트번호)
@@ -32,21 +31,11 @@ const options = {  //broker 연동 위한 옵션(브로커 IP 및 포트번호)
 
 let mqttClient = mqtt.connect(options);
 
-let loop = 100; // 1억
+let loop = 20; // 1억
 let sum = 0;
 let startTime;
 let endTime;
 
-class Mesuare {
-    constructor() {
-        this.departure_time = []
-
-    }
-
-    getNumber() {
-        departure_time.push();
-    }
-};
 
 mqttClient.on('connect', function () {
 
@@ -64,6 +53,7 @@ mqttClient.on('message', async (topic, message, packet) => {
     }
     if (topic == `audio`) {
         endTime = new Date().getTime();
+        audioMesure.putArrivalTime(endTime)
         console.log(endTime - startTime);
     }
 
@@ -434,9 +424,11 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
                         const performEvalue = setInterval(function () { // 5초 후 실행
                             if (count > loop) {
                                 clearInterval(performEvalue);
+                                audioMesure.write()
                             }
 
                             startTime = new Date().getTime();
+                            audioMesure.putDepartureTime(startTime)
                             mqttClient.publish(`audio`, JSON.stringify(buf));
 
                             console.log(count + ' : publish');

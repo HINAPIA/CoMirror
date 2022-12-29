@@ -1,10 +1,13 @@
 const writeXlsxFile = require("write-excel-file/node");
 const fs = require("fs");
 
-class Mesuare {
+// calculator-base.js
+
+class Mesure {
     
-    constructor(cnt){
+    constructor(cnt,type){
         this.TEST_COUNT = cnt
+        this.type = type
         this.departure_time = []
         this.arrival_time = []
     }
@@ -20,7 +23,7 @@ class Mesuare {
 
         const HEADER_ROW = [
             {
-              value: "//",
+              value: "",
               fontWeight: "bold",
             },
             {
@@ -41,15 +44,19 @@ class Mesuare {
           for (let i = 0; i< this.TEST_COUNT; i++){
             let  DATA_ROW = [
                 {
+                    type:String,
+                    value:this.type
+                },
+                {
                     type:Date,
                     value: new Date(),
-                    format:"yyyy/mm/dd"
+                    format:"hh:mm:ss"
                     // value:this.departure_time[i]
                 },
                 {
                     type:Date,
                     value: new Date(),
-                    format:"yyyy/mm/dd"
+                    format:"hh:mm:ss"
                     // type:Date,
                     // value:this.arrival_time[i]
 
@@ -81,5 +88,8 @@ class Mesuare {
     
 };
 
-const mesure = new Mesuare(10)
-mesure.write()
+// const mesure = new Mesuare(10,"이미지")
+// mesure.write()
+module.exports = Mesure
+
+
