@@ -6,12 +6,12 @@ class Measure {
     constructor(cnt,type){
         this.TEST_COUNT = cnt
         this.type = type
-        this.departmentTime = []
+        this.departureTime = []
         this.arrivalTime = []
     }
 
     putDepartureTime(time) {
-        this.departmentTime.push(time);
+        this.departureTime.push(time);
     }
     putArrivalTime(time) {
         this.arrivalTime.push(time);
@@ -47,7 +47,7 @@ class Measure {
                 },
                 {
                     type:String,
-                    value:`${this.departmentTime[i].getHours().toString()}:${this.departmentTime[i].getMinutes().toString()}:${this.departmentTime[i].getSeconds().toString()}.${this.departmentTime[i].getUTCMilliseconds().toString()}`
+                    value:`${this.departureTime[i].getHours().toString()}:${this.departureTime[i].getMinutes().toString()}:${this.departureTime[i].getSeconds().toString()}.${this.departureTime[i].getUTCMilliseconds().toString()}`
                     
                 },
                 {
@@ -56,7 +56,7 @@ class Measure {
                 },
                 {
                     type:Number,
-                    value:this.arrivalTime[i] - this.departmentTime[i]
+                    value:this.arrivalTime[i] - this.departureTime[i]
                 }
             ]
 
@@ -80,8 +80,6 @@ class Measure {
     
 };
 
-// const mesure = new Mesuare(10,"이미지")
-// mesure.write()
 module.exports = Measure
 
 
