@@ -22,6 +22,7 @@ close_flag = False
 stopFlag = False
 id = 0
 login_img_count = 20
+signup_img_count = 50
 
 curDir = os.path.dirname(os.path.realpath(__file__))
     #curDir = '.' + os.path.sep + 'faceRecognition'
@@ -158,12 +159,12 @@ while True :
             client.publish('createAccount/start', str(mirror_id) + str(id))
             # 카메라로 사진 찍어서 얼굴부분만 크롭해서 저장
             dir_name = os.path.join('face','train')
-            saved_folder = camera.createCropImage('user', dir_name, 20)
+            saved_folder = camera.createCropImage('user', dir_name, signup_img_count)
            
             # 사진 넘겨주기
             imagelist = camera.load_image(saved_folder)
             
-            for i in range(20) :
+            for i in range(signup_img_count) :
                 imageByte = imagelist.pop()        
                 # 서버에 보냄   
                 client.publish('createAccount/image', bytearray(str(mirror_id), 'utf-8') + imageByte)
