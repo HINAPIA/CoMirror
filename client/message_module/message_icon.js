@@ -21,7 +21,7 @@ let customFriend = null
 // 성능평가 위한 변수/////////////////////////////////////////////////////////
 
 const PERFORM_EVALUATION = true
-const Measure = require("../../evaluation/mesure")
+const Measure = require("../../evaluation/measure")
 let audioMeasure = new Measure(20,"오디오")
 let imageMeasure = new Measure(20,"이미지")
 let textMeasure = new Measure(20,"텍스트")
