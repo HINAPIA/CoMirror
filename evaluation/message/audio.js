@@ -1,4 +1,5 @@
-const mqtt = require('mqtt')
+
+
 const moment = require('moment')
 const options = {  //broker 연동 위한 옵션(브로커 IP 및 포트번호)
   host: '127.0.0.1',

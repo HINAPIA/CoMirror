@@ -3,11 +3,13 @@ const { write } = require("fs");
 const CMUsers = require("../CMUserInfo");
 const fs = require('fs')
 const moment = require('moment');
+
 const innerClient = require("./message_mqtt");
 const outerClient = require('../mqtt')
 const socket = require('../message_module/message_socket');
 let record_obj = require('../message_module/record/new_m_record');
 const dbAccess = require("../mirror_db");
+
 
 
 let messageAccess = {} // 모듈 제작을 위한 변수
@@ -16,6 +18,57 @@ let setCMuser
 let setCMFriend
 let customOption = false
 let customFriend = null
+
+// 성능평가 위한 변수/////////////////////////////////////////////////////////
+
+
+
+const PERFORM_EVALUATION = true
+const mqtt = require('mqtt')
+const options = {  //broker 연동 위한 옵션(브로커 IP 및 포트번호)
+    host: '127.0.0.1',
+    port: 1883
+};
+
+let mqttClient = mqtt.connect(options);
+
+let loop = 100; // 1억
+let sum = 0;
+let startTime;
+let endTime;
+
+class Mesuare {
+    constructor() {
+        this.departure_time = []
+
+    }
+
+    getNumber() {
+        departure_time.push();
+    }
+};
+
+mqttClient.on('connect', function () {
+
+    console.log("서버 mqtt와 연결");
+    //real time message 받는 토픽
+    mqttClient.subscribe(`image`);
+    mqttClient.subscribe(`audio`);
+})
+
+mqttClient.on('message', async (topic, message, packet) => {
+    //로그인시 서버로부터 받은 메시지 저장 
+    if (topic == `image`) {
+        endTime = new Date().getTime();
+        console.log(endTime - startTime);
+    }
+    if (topic == `audio`) {
+        endTime = new Date().getTime();
+        console.log(endTime - startTime);
+    }
+
+})
+////////////////////////////////////////////////////////////////////////////
 
 const bar_message_button = document.querySelector("#bar_message_button");
 const message_memo_container = document.querySelector("#message_memo_container");
@@ -89,7 +142,7 @@ bar_message_button.addEventListener('click', () => {
     console.log('bar_message_button click!');
 
     progressbar.style.display = "none"
-   // message_send_watch.style.visibility = "hidden"
+    // message_send_watch.style.visibility = "hidden"
 
     document.querySelector("#textArea").value = "";
     customFriend = null
@@ -125,7 +178,7 @@ bar_message_button.addEventListener('click', () => {
         }
 
         message_memo_container.style.display = "none";
-        document.getElementById('msg-img').src= ''
+        document.getElementById('msg-img').src = ''
         // camera off
         innerClient.publish('camera/close', 'ok')
     }
@@ -305,28 +358,104 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
     }
 
     /* ---------------------- 미러 내 사용자 ---------------------- */
-    if (send_option == 0) { 
+    if (send_option == 0) {
         if (type_check == "text") { // text 전송일 때
             // text 내용 받아오기
             dbAccess.createColumns('message', data)
         }
         else if (type_check == "image") { // image 전송일 때
-            //서버로 메시지를 보내는 이벤트 publish
-            // innerClient.publish('send/image', 'send');
-            console.log("image send success");
 
-            dbAccess.createColumns('message', data)
-        }
-        else { // audio 전송일 때
-            var reader = new FileReader();
-            reader.readAsDataURL(blob);
+            let img = document.getElementById('msg-img')
+            let c = document.createElement('canvas');
+            let ctx = c.getContext('2d');
+            c.width = 900;
+            c.height = 600;
+            ctx.drawImage(img, 0, 0, c.width, c.height);
+            let base64SData = c.toDataURL().split(',')[1];
+            buf = {
+                receiver: "1001",
+                sender: "4004",
+                type: 'image',
+                content: base64SData,
+                send_time: send_time
+                // "type": "image",                      
+            }
+            if (PERFORM_EVALUATION) {
 
-            reader.onloadend = function () {
-                var base64 = reader.result;
-                var base64Audio = base64.split(',').reverse()[0];
-                var bstr = atob(base64Audio); // base64String
+                let count = 0;
+                // 사진
+                const performEvalue = setInterval(function () { // 5초 후 실행
+                    if (count > loop) {
+                        clearInterval(performEvalue);
+                    }
+
+                    startTime = new Date().getTime();
+                    mqttClient.publish(`image`, JSON.stringify(buf));
+
+                    console.log(count + ' : publish');
+                    count++;
+                }, 1500)
+            }
+            else {
+                //서버로 메시지를 보내는 이벤트 publish
+                // innerClient.publish('send/image', 'send');
+                console.log("image send success");
 
                 dbAccess.createColumns('message', data)
+            }
+        }
+        else { // audio 전송일 때
+            if (PERFORM_EVALUATION) {
+                var reader = new FileReader(); // new_m_record.js에서 녹음한 blob 객체
+                var blob = record_obj.getBlob(); // 컨텐츠를 특정 Blob에서 읽어 옴
+
+                reader.readAsDataURL(blob);
+                reader.onloadend = function () {
+                    var base64 = reader.result; // base64 인코딩 된 스트링 데이터가 result 속성에 담아지게 됩니다.
+                    // console.log(`After Audio Base64 : ${base64}`)
+                    // var base64Audio = base64.split(',').reverse()[0];
+                    var base64Audio = base64.split(',').reverse()[0];
+                    console.log(`base64Audio : ${base64Audio}`)
+
+                    new Promise((resolve, reject) => {
+                        var bstr = atob(base64Audio); // base64String 
+                        var buf = {
+                            receiver: "4004",
+                            sender: "1001",
+                            type: 'audio',
+                            content: bstr,
+                            send_time: send_time
+                        }
+                        resolve(buf);
+                    }).then((buf) => {
+
+                        let count = 0;
+                        // 사진
+                        const performEvalue = setInterval(function () { // 5초 후 실행
+                            if (count > loop) {
+                                clearInterval(performEvalue);
+                            }
+
+                            startTime = new Date().getTime();
+                            mqttClient.publish(`audio`, JSON.stringify(buf));
+
+                            console.log(count + ' : publish');
+                            count++;
+                        }, 1500)
+                    })
+                }
+            }
+            else {
+                var reader = new FileReader();
+                reader.readAsDataURL(blob);
+
+                reader.onloadend = function () {
+                    var base64 = reader.result;
+                    var base64Audio = base64.split(',').reverse()[0];
+                    var bstr = atob(base64Audio); // base64String
+
+                    dbAccess.createColumns('message', data)
+                }
             } // end of reader.onloadend ...
 
         } // end of else ...
@@ -337,15 +466,15 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
         switch (type_check) {
             case 'text':
                 let content = document.querySelector("#textArea").value;
-                buf ={
+                buf = {
                     sender: sender,
                     receiver: receiver,
                     content: content,
-                    type: 'text',   
-                    send_time: send_time                 
+                    type: 'text',
+                    send_time: send_time
                 }
                 //online user
-                if (connect) {                    
+                if (connect) {
                     outerClient.publish(`${receiver}/connect_msg`, JSON.stringify(buf));
                 } else {
                     //서버에 메시지를 저장하는 방법으로 메시지를 보냄
@@ -360,29 +489,48 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
                 c.height = 600;
                 ctx.drawImage(img, 0, 0, c.width, c.height);
                 let base64SData = c.toDataURL().split(',')[1];
-                buf ={                            
+                buf = {
                     receiver: receiver,
                     sender: sender,
-                    type: 'image',   
-                    content: base64SData,                    
+                    type: 'image',
+                    content: base64SData,
                     send_time: send_time
                     // "type": "image",                      
                 }
-                if (connect) {
+                if (PERFORM_EVALUATION) {
+
+                    let count = 0;
+                    // 사진
+                    const performEvalue = setInterval(function () { // 5초 후 실행
+                        if (count > loop) {
+                            clearInterval(performEvalue);
+                        }
+
+                        startTime = new Date().getTime();
+                        mqttClient.publish(`image`, JSON.stringify(buf));
+
+                        console.log(count + ' : publish');
+                        count++;
+                    }, 1000)
+
+
+                }
+                else if (connect) {
                     console.log("실시간 메시지 전달 : image");
                     outerClient.publish(`${receiver}/connect_msg`, JSON.stringify(buf));
-                    
+
+
                 } else {
                     console.log("논실시간 메시지 전달");
                     //서버에서 메시지를 저장
-                    outerClient.publish("server/send/msg" , JSON.stringify(buf))
+                    outerClient.publish("server/send/msg", JSON.stringify(buf))
 
                 }
                 break;
             case 'audio':
                 var reader = new FileReader(); // new_m_record.js에서 녹음한 blob 객체
                 var blob = record_obj.getBlob(); // 컨텐츠를 특정 Blob에서 읽어 옴
-                
+
                 reader.readAsDataURL(blob);
                 reader.onloadend = function () {
                     var base64 = reader.result; // base64 인코딩 된 스트링 데이터가 result 속성에 담아지게 됩니다.
@@ -414,9 +562,9 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
                             // });
                         } else {
                             console.log("논실시간 메시지 전달");
-                            outerClient.publish("server/send/msg" , JSON.stringify(buf))
+                            outerClient.publish("server/send/msg", JSON.stringify(buf))
                             // axios({
-                            //     url: 'http://192.168.0.1:9000/send/audio', // 통신할 웹문서
+                            //     url: 'http://192.168.0.2:9000/send/audio', // 통신할 웹문서
                             //     method: 'post', // 통신할 방식
                             //     data: { // 인자로 보낼 데이터
                             //         receiver: receiver,
@@ -458,7 +606,7 @@ function showRecordContent() {
 function showWrite() {
 
     // 처음 메시지 창을 띄울 때 text content 부터 보여주기
-    if(back_button.style.display == "none"){
+    if (back_button.style.display == "none") {
         text_label.style.display = "block";
         image_label.style.display = "block";
         record_label.style.display = "block";
@@ -471,7 +619,6 @@ function showWrite() {
     write_button.style.display = "none";
     back_button.style.display = "block";
 
-    
     // 메시지함 숨기기
     document.getElementById('message_storage_view').style.display = "none";
 

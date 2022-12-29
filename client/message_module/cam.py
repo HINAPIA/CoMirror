@@ -6,14 +6,19 @@ import paho.mqtt.client as mqtt
 from datetime import datetime
 import platform
 
-osName = platform.system()
+
+cam = None
 # if(osName == "Windows"):
 #     cam = cv2.VideoCapture(0)
 # else: cam = cv2.VideoCapture(cv2.CAP_V4L2)
-cam = None
-#cam = cv2.VideoCapture(cv2.CAP_ANY)
-print("os" + osName)
 
+#cam = cv2.VideoCapture(cv2.CAP_ANY)
+# print("0000")
+# cam = cv2.VideoCapture(0)
+# print("11111")
+# cam.set(cv2.CAP_PROP_FRAME_WIDTH, 500)
+# cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+# print("2222")
 capture_on = False
 createImageFalg = False
 capture_type = None
@@ -66,7 +71,8 @@ def onCam():
         # if(osName == "Windows"):
         #     cam = cv2.VideoCapture(0)
         # else: cam = cv2.VideoCapture(cv2.CAP_V4L2)
-        cam =cv2.VideoCapture(cv2.CAP_V4L2)
+        #cam =cv2.VideoCapture(0)
+        cam =cv2.VideoCapture(0)
         cam.set(cv2.CAP_PROP_BUFFERSIZE, 1) # 버퍼크기는 1~10까지 유효함
         buffersize = cam.get(cv2.CAP_PROP_BUFFERSIZE)
         # #리눅스
@@ -128,6 +134,9 @@ def createImage():
         if(capture_type == 'memo'):
             now = datetime.now()
             file_name_path = (str)(now.timestamp())
+
+            frame = cv2.resize((frame), (900, 600))
+
             cv2.imwrite('../memo_module/image' + '/'+file_name_path +'.jpg', frame)
             client.publish('memo/capture/done', (str)(file_name_path))
             capture_on = False

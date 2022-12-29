@@ -362,14 +362,6 @@ const setLocalStream = async function (audioValue, videoValue, setStream) {
 
 
   if (videoValue == true) {
-    // ****************************************
-    /*
-    if (localStream != undefined) {
-      await localStream.getTracks().forEach(function (track) {
-        track.stop();
-      });
-    }*/
-    // ****************************************
     mediaConstraints.video = { width: 1800, height: 1200 }
   }
 
