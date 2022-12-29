@@ -1,20 +1,20 @@
 const writeXlsxFile = require("write-excel-file/node");
 const fs = require("fs");
 
-class Mesure {
+class Measure {
     
     constructor(cnt,type){
         this.TEST_COUNT = cnt
         this.type = type
-        this.departure_time = []
-        this.arrival_time = []
+        this.departmentTime = []
+        this.arrivalTime = []
     }
 
     putDepartureTime(time) {
-        this.departure_time.push(time);
+        this.departmentTime.push(time);
     }
     putArrivalTime(time) {
-        this.arrival_time.push(time);
+        this.arrivalTime.push(time);
     }
 
     write() {
@@ -47,16 +47,16 @@ class Mesure {
                 },
                 {
                     type:String,
-                    value:`${this.departure_time[i].getHours().toString()}:${this.departure_time[i].getMinutes().toString()}:${this.departure_time[i].getSeconds().toString()}.${this.departure_time[i].getUTCMilliseconds().toString()}`
+                    value:`${this.departmentTime[i].getHours().toString()}:${this.departmentTime[i].getMinutes().toString()}:${this.departmentTime[i].getSeconds().toString()}.${this.departmentTime[i].getUTCMilliseconds().toString()}`
                     
                 },
                 {
                     type:String,
-                    value:`${this.arrival_time[i].getHours().toString()}:${this.arrival_time[i].getMinutes().toString()}:${this.arrival_time[i].getSeconds().toString()}.${this.arrival_time[i].getUTCMilliseconds().toString()}`
+                    value:`${this.arrivalTime[i].getHours().toString()}:${this.arrivalTime[i].getMinutes().toString()}:${this.arrivalTime[i].getSeconds().toString()}.${this.arrivalTime[i].getUTCMilliseconds().toString()}`
                 },
                 {
                     type:Number,
-                    value:this.arrival_time[i] - this.departure_time[i]
+                    value:this.arrivalTime[i] - this.departmentTime[i]
                 }
             ]
 
@@ -82,6 +82,6 @@ class Mesure {
 
 // const mesure = new Mesuare(10,"이미지")
 // mesure.write()
-module.exports = Mesure
+module.exports = Measure
 
 

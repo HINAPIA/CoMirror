@@ -10,8 +10,6 @@ const socket = require('../message_module/message_socket');
 let record_obj = require('../message_module/record/new_m_record');
 const dbAccess = require("../mirror_db");
 
-const Mesure = require("../../evaluation/mesure")
-let audioMesure = new Mesure(20,"오디오")
 
 let messageAccess = {} // 모듈 제작을 위한 변수
 
@@ -23,6 +21,11 @@ let customFriend = null
 // 성능평가 위한 변수/////////////////////////////////////////////////////////
 
 const PERFORM_EVALUATION = true
+const Measure = require("../../evaluation/mesure")
+let audioMeasure = new Measure(20,"오디오")
+let imageMeasure = new Measure(20,"이미지")
+let textMeasure = new Measure(20,"텍스트")
+
 const mqtt = require('mqtt')
 const options = {  //broker 연동 위한 옵션(브로커 IP 및 포트번호)
     host: '127.0.0.1',
@@ -41,19 +44,26 @@ mqttClient.on('connect', function () {
 
     console.log("서버 mqtt와 연결");
     //real time message 받는 토픽
+    mqttClient.subscribe(`text`);
     mqttClient.subscribe(`image`);
     mqttClient.subscribe(`audio`);
 })
 
 mqttClient.on('message', async (topic, message, packet) => {
     //로그인시 서버로부터 받은 메시지 저장 
+    if (topic == `text`) {
+        endTime = new Date();
+        textMeasure.putArrivalTime(endTime)
+        console.log(endTime - startTime);
+    }
     if (topic == `image`) {
         endTime = new Date();
+        imageMeasure.putArrivalTime(endTime)
         console.log(endTime - startTime);
     }
     if (topic == `audio`) {
         endTime = new Date();
-        audioMesure.putArrivalTime(endTime)
+        audioMeasure.putArrivalTime(endTime)
         console.log(endTime - startTime);
     }
 
@@ -350,8 +360,38 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
     /* ---------------------- 미러 내 사용자 ---------------------- */
     if (send_option == 0) {
         if (type_check == "text") { // text 전송일 때
-            // text 내용 받아오기
-            dbAccess.createColumns('message', data)
+
+            if (PERFORM_EVALUATION) {
+
+                let count = 0;
+                var buf = {
+                    sender:"1001",
+                    receiver: "4004",
+                    content: "오늘 저녁 뭐먹어?", //평균 바이트 문자열
+                    type: 'text',
+                    send_time: time
+                }
+                // 텍스트
+                const performEvalue = setInterval(function () { // 5초 후 실행
+                    if (count >= loop) {
+                        clearInterval(performEvalue);
+                        textMeasure.write()
+                    }
+
+                    startTime = new Date();
+                    textMeasure.putDepartureTime(startTime)
+                    mqttClient.publish(`text`, JSON.stringify(buf));
+
+                    console.log(count + ' : publish');
+                    count++;
+                }, 100)
+            }
+
+            else {
+                // text 내용 받아오기
+                dbAccess.createColumns('message', data)
+
+            }
         }
         else if (type_check == "image") { // image 전송일 때
 
@@ -377,9 +417,11 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
                 const performEvalue = setInterval(function () { // 5초 후 실행
                     if (count >= loop) {
                         clearInterval(performEvalue);
+                        imageMeasure.write()
                     }
 
                     startTime = new Date();
+                    imageMeasure.putDepartureTime(startTime)
                     mqttClient.publish(`image`, JSON.stringify(buf));
 
                     console.log(count + ' : publish');
@@ -424,11 +466,11 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
                         const performEvalue = setInterval(function () { // 5초 후 실행
                             if (count >= loop) {
                                 clearInterval(performEvalue);
-                                audioMesure.write()
+                                audioMeasure.write()
                             }
 
                             startTime = new Date();
-                            audioMesure.putDepartureTime(startTime)
+                            audioMeasure.putDepartureTime(startTime)
                             mqttClient.publish(`audio`, JSON.stringify(buf));
 
                             console.log(count + ' : publish');
