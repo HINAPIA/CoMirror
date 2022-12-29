@@ -17,7 +17,7 @@ function createWindow() {
     }
 
 
-    options.fullscreen = true
+    //options.fullscreen = true
     options.autoHideMenuBar = true
     const win = new BrowserWindow(options)
 

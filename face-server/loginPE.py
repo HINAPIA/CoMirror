@@ -203,7 +203,14 @@ def class_probability_evaluation(train_cnt, repeat_cnt, select_cnt, mirror_id):
         recognition_prob_sum += score_probability
     #측정 끝
     print('##### 최종 recognition_prob_mean : %.3f | class_prob_mean : %.3f' %(recognition_prob_sum/repeat_cnt, class_prob_sum/repeat_cnt))
-       
+
+    #field_name = ['']
+    #make_csv("test.csv", )
+
+
+#def make_csv(file_name, field_name, row_data):
+    
+
 
 mirror_id = str(400)
 #embedding_dataset = os.path.join('dataPE',mirror_id, 'files','login-embeddings.npz')

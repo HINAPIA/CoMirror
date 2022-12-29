@@ -29,7 +29,7 @@ delete_id = ''
 user_id = 0
 count= 0
 login_img_count=20
-
+signup_img_count = 50
 
 def on_connect(client, userdata, flag, rc):
     print("Connect with result code:"+ str(rc))
@@ -117,7 +117,7 @@ def on_message(client, userdata, msg):
         if(flag):
             mirror_id = msg.payload[0:3].decode('utf-8')
             file =msg.payload[3:]
-            count = (count +1)%20
+            count = (count +1)%50
             file_path = os.path.join('mirror', str(mirror_id), 'train', str(user_id) )
             #폴더 생성
             if (os.path.exists(file_path)):
