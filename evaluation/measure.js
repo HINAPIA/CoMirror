@@ -84,7 +84,7 @@ class Measure {
     }
   }
 
-  write() {
+  write(text) {
     const data = [this.HEADER_ROW, ...this.DATA_ROWS]
 
     const makeExcel = async () => {
@@ -93,7 +93,7 @@ class Measure {
         fs.mkdirSync("./excel");
       }
       await writeXlsxFile(data, {
-        filePath: "./excel/messageMeasure.xlsx",
+        filePath: "./excel/"+text+"Measure.xlsx",
       });
     };
 

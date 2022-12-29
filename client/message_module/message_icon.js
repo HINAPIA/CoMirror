@@ -66,6 +66,22 @@ mqttClient.on('message', async (topic, message, packet) => {
     }
 
 })
+
+const evaluation_button = document.getElementsByClassName('evaluation_button');
+if(PERFORM_EVALUATION) {
+    for (let i = 0; i < evaluation_button.length; i++) {
+        evaluation_button[i].style.display = "block";
+        evaluation_button[i].addEventListener('click', writeXlsxFile)
+    }
+}
+
+function writeXlsxFile() {
+    if (image.checked == true) imageMeasure.write("image");
+    else if (record.checked == true) audioMeasure.write("record");
+    else textMeasure.write("text");
+
+}
+
 ////////////////////////////////////////////////////////////////////////////
 
 const bar_message_button = document.querySelector("#bar_message_button");
@@ -198,15 +214,10 @@ outside.addEventListener('change', showUserBook);
 shutter_button.addEventListener('click', () => {
     innerClient.publish('capture/camera', "start");
 });
-let i=0;
 function showSendModal() {
     inside_label.click()
     hideKeyboard();
-    console.log("showSendModal"+i);
-
-    // if(i >= 5){
-    //     textMeasure.write()
-    // }
+    console.log("showSendModal");
 
     /*
     if(i >= 3){
