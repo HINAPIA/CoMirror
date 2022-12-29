@@ -135,6 +135,9 @@ function friendAlertOff() {
     send_modal.style.visibility = "hidden";
     inside_selected.style.visibility = 'hidden';
     outside_selected.style.visibility = 'hidden';
+    //초기화
+    inside.checked = false
+    outside.checked = false
 }
 
 // message display ON/OFF
@@ -190,7 +193,8 @@ back_button.addEventListener('click', showStore);
 for (let i = 0; i < send_button.length; i++) {
     send_button[i].addEventListener('click', showSendModal);
 }
-inside.addEventListener('change', showUserBook);
+
+inside.addEventListener('change', showUserBook); 
 outside.addEventListener('change', showUserBook);
 
 shutter_button.addEventListener('click', () => {
@@ -210,7 +214,7 @@ function MessageSenderView() {
     }
     else {
         inside_label.click()
-        //messageAccess.showUserBook();
+       // messageAccess.showUserBook(); 
     }
 }
 
