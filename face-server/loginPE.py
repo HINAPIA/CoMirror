@@ -19,6 +19,7 @@ import os
 import os.path
 from sklearn.metrics import accuracy_score
 import random
+import csv
 curDir = os.path.dirname(os.path.realpath(__file__))
 os.chdir(curDir)
 embeddingModel = load_model('facenet_keras.h5')
@@ -155,13 +156,12 @@ def user_check_PE(count, embedding_dataset, mirror_id):
 
 
 #reTrain_PE(embeddingModel, 400)
-
-
 #user_check_PE(embedding_dataset, "400")
 
 # 얼굴인식 모델 훈련 때 사용한 사진의 수, 데이터 측정을 반복 횟수, 몇 장을 랜덤으로 뽑을 건지 입력 받아서
 # 인식률과 분류율을 콘솔로 띄우고 파일로 저장하는 함수
 def class_probability_evaluation(train_cnt, repeat_cnt, select_cnt, mirror_id):
+    datas=[]
     mirror_id = str(mirror_id)
     #분류율
     class_prob_sum = 0
@@ -187,23 +187,39 @@ def class_probability_evaluation(train_cnt, repeat_cnt, select_cnt, mirror_id):
         # 중복 없이 select_cnt 값만큼 인덱스 뽑기
         selection = random.sample(range(0,testX.shape[0]-1),select_cnt)
         #뽑은 데이터 predict
-        yhat_test = model.predict(testX[selection])
-        predict_names = out_encoder.inverse_transform(yhat_test)
+        yhat_test=model.predict(testX[selection])
+        predict_names=out_encoder.inverse_transform(yhat_test)
         #인식률
-        score_test = accuracy_score(testY[selection], predict_names) 
-        score_probability =score_test*100
+        score_test=accuracy_score(testY[selection], predict_names) 
+        score_probability=score_test*100
         # 분류율
-        yhat_prob =list(map(max,model.predict_proba(testX[selection])))
-        class_probability = yhat_prob*100
+        yhat_prob=list(map(max,model.predict_proba(testX[selection])))
+        class_probability=yhat_prob*100
         class_probability_mean = sum(class_probability)/len(class_probability)*100
         # end of select_cnt roof
         print('[%d] train_cnt : %d |  select_cnt : %d | recognition_prob =%.3f , class_prob = %.3f' % (repeat_index, train_cnt,select_cnt, score_probability, class_probability_mean))
         class_prob_sum += class_probability_mean
         #인식률
         recognition_prob_sum += score_probability
+        data = [train_cnt, select_cnt, repeat_index, score_probability, class_probability_mean]
+        datas.append(data)
     #측정 끝
     print('##### 최종 recognition_prob_mean : %.3f | class_prob_mean : %.3f' %(recognition_prob_sum/repeat_cnt, class_prob_sum/repeat_cnt))
-       
+
+    # field_name = ['회원가입 사진 장 수', '로그인 사진 장 수', '로그인 회차', '인식률', '분류율']
+    field_name = ['train_cnt', 'sselect_cnt', 'repeat_index', 'score_probability', 'class_probability_mean']
+    make_csv('test.csv', field_name, datas)
+
+
+# csv 파일 생성
+def make_csv(file_name, field_name, datas):
+    file_path = './csv/'+file_name
+    with open(file_path, 'w',encoding='utf-8') as f:
+        write = csv.writer(f)
+        write.writerow(field_name)
+        write.writerows(datas)
+    f.close
+
 
 mirror_id = str(400)
 #embedding_dataset = os.path.join('dataPE',mirror_id, 'files','login-embeddings.npz')
