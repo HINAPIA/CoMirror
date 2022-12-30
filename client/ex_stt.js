@@ -6,48 +6,13 @@ const options = {  //broker 연동 위한 옵션(브로커 IP 및 포트번호)
 };
 mqttClient = mqtt.connect(options);
 
-let loop = 100; // 1억
-let sum = 0;
-let startTime;
-let endTime;
-
-
-console.log("stt start");
-
-let count = 0;
-// 사진
-const performEvalue = setInterval(function () { // 5초 후 실행
-  if(count>loop){
-    clearInterval(performEvalue);
-  }
-  
-  var time = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
-  var buf = {
-      sender:"1001",
-      receiver: "4004",
-      content: "오늘 저녁 뭐먹어?",
-      type: 'text',
-      send_time: time
-  }
-
-  startTime = new Date().getTime();
-  mqttClient.publish(`text`, JSON.stringify(buf))
-  console.log(count+' : publish');
-  count++;
-}, 1000)
-
-mqttClient.on('connect', function () {
-
-    console.log("서버 mqtt와 연결");
-    //real time message 받는 토픽
-    mqttClient.subscribe(`text`);
-})
-
-mqttClient.on('message', async (topic, message, packet) => {
-    //로그인시 서버로부터 받은 메시지 저장 
-    if (topic == `text`) {
-      endTime = new Date().getTime();
-      console.log(endTime - startTime);
-    }
-
-})
+mqttClient.publish(`text`, "집에 가고 싶어 언제쯤 갈 수 있을까?")
+mqttClient.publish(`text`, "내일 오후 10시에 우리집으로 와")
+mqttClient.publish(`text`, "내일 아이디어 회의 어디서 몇 시에 할까?")
+mqttClient.publish(`text`, "오늘 점심값 삼만원 나왔어 만오천원 보내줘")
+mqttClient.publish(`text`, "우리의 다음 목표 C&C 페스티벌 1등")
+mqttClient.publish(`text`, "파이썬 보조 언제부터라고?")
+mqttClient.publish(`text`, "시험 망쳤어 이번 방학에는 공부해야겠다 ")
+mqttClient.publish(`text`, "그래서 학원 등록했어 안했어?")
+mqttClient.publish(`text`, "우리 언제 놀러갈래?")
+mqttClient.publish(`text`, "팥고당은 딸기라떼가 맛있다")

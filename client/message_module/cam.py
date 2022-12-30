@@ -135,7 +135,7 @@ def createImage():
             now = datetime.now()
             file_name_path = (str)(now.timestamp())
 
-            frame = cv2.resize((frame), (900, 600))
+            frame = cv2.resize((frame), (1280, 720))
 
             cv2.imwrite('../memo_module/image' + '/'+file_name_path +'.jpg', frame)
             client.publish('memo/capture/done', (str)(file_name_path))

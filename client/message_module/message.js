@@ -24,43 +24,44 @@ const { rejects } = require('assert');
 const client = require("../mqtt");
 const { resolve } = require('path');
 
+const Measure = require("../../evaluation/measure")
 
 var reply_btn = document.getElementById('reply_btn');
-reply_btn.onclick= () =>{reply_message();}
+reply_btn.onclick = () => { reply_message(); }
 
 // var reply_text = document.getElementById('reply-text');
 // reply_text.addEventListener('change', ()=>)
 reply_btn.addEventListener('click', reply_message());
 
 // 간편답장 input 태그에 가상 키보드 달기
-document.getElementById("reply_text").addEventListener("click",function(e){showKeyboard(e)})
-function showKeyboard(e){
+document.getElementById("reply_text").addEventListener("click", function (e) { showKeyboard(e) })
+function showKeyboard(e) {
     keyboardTarget.setCurrentTarget(e.target.id);
-    keyboardTarget.keyboard.style.display="block";
+    keyboardTarget.keyboard.style.display = "block";
 }
 
-function hideKeyboard(){
+function hideKeyboard() {
     keyboardTarget.setCurrentTarget(null);
-    keyboardTarget.keyboard.style.display="none";
+    keyboardTarget.keyboard.style.display = "none";
 }
 
 //선택한 메시지 디테일 메시지 창에 띄우기
 function message_detail(msg_id) {
     var contents = document.getElementsByClassName('message-content')
-    
+
     for (var i = 0; i < contents.length; i++) {
         // var content = contents.item(i)
         contents[i].style.backgroundColor = 'black';
         if (contents[i].getAttribute('value') == msg_id) {
             contents[i].style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
             //new 떼기
-            if(contents[i].hasChildNodes()){
+            if (contents[i].hasChildNodes()) {
                 var children = contents[i].childNodes;
-                if(children<2) continue;
-                    contents[i].innerText = (String)(contents[i].innerText).replace('new','');                                 
-                }
-            }       
+                if (children < 2) continue;
+                contents[i].innerText = (String)(contents[i].innerText).replace('new', '');
+            }
         }
+    }
     document.getElementById('message-detail-container').style.visibility = 'visible';
     //선택된 메시지를 message DB에서 찾음
     mirror_db.select('*', 'message', `msg_id=${msg_id}`)
@@ -126,7 +127,7 @@ function message_detail(msg_id) {
             }
             detail_time_div.innerHTML = moment(selected_msg.time).format('MM/DD HH:mm')
         })
-        
+
 }
 
 //해당 함수 호출시 미러 내 message DB에서 메시지를 가져와 나에게 온 메세지를 띄움
@@ -134,9 +135,10 @@ function initMessages() {
     console.log('#####initMessages#####');
     message_list = Array()
     mirror_db.select('*', 'message', `receiver = ${mirror_db.getId()}`)
-        .then(messages => { 
-            if(messages.length <=0) return;
-            insertMessageContent(messages, 'init') })
+        .then(messages => {
+            if (messages.length <= 0) return;
+            insertMessageContent(messages, 'init')
+        })
 
 }
 
@@ -149,18 +151,18 @@ function insertMessageContent(messages, type) {
     //friend {id : name} 객체 생성
     mirror_db.select('*', 'friend', `id=${mirror_db.getId()}`)
         .then(friends => {
-            if(friends.length <=0) resolve();
+            if (friends.length <= 0) resolve();
             friends.forEach(element => {
                 freinds_obj[element.friend_id] = element.name;
             })
         })
         .then(() => {
-            var i=0;
+            var i = 0;
 
             let msg_slider = document.getElementById('msg-slider');
             msg_slider.textContent = '';
-            for ( i; i < messages.length; i++) {    
-                let message = messages[i];  
+            for (i; i < messages.length; i++) {
+                let message = messages[i];
                 let messageContent = document.createElement('div');
                 messageContent.setAttribute('class', 'message-content');
                 var sender_name = freinds_obj[messages[i].sender];
@@ -180,22 +182,22 @@ function insertMessageContent(messages, type) {
                         break;
                 }
                 //보낸이
-             //   console.log('sender_name.type',sender_name);
+                //   console.log('sender_name.type',sender_name);
                 if (sender_name == null) {
                     messageContent.innerHTML = `[${message.sender}] ${content}`
                 }
                 else
                     messageContent.innerHTML = `[${sender_name}] ${content}`
 
-            
-                
+
+
                 msg_list[i] = messageContent;
                 messageContent.addEventListener("click", function (e) {
                     //console.log("이 이벤트 리스너가 불리긴 함")
-                  
+
                     let msg_id = e.target.getAttribute('value');
                     let currentTargetId = e.target.value; // 현재 클릭된 li
-                    console.log('msg_id: ',msg_id);
+                    console.log('msg_id: ', msg_id);
                     if (currentTargetId != lastClickedId) {  // 현재 클릭된 아이디가 마지막으로 클릭된 아이디와 다를 때 -> message_detail함수 호출 + 마지막으로 클릭된 아이디 갱신
                         // console.log("현재 클릭된 value가 마지막으로 클릭된 아이디와 다를 때")
                         // console.log(`current:${currentTargetId}, last:${lastClickedId}`)
@@ -210,10 +212,10 @@ function insertMessageContent(messages, type) {
                         document.getElementById('message-detail-container').style.visibility = 'hidden';
                     }
                 })
-                
+
                 //홀수 일 때
-                if( messages.length %2==1){
-                    if(i==0) continue;
+                if (messages.length % 2 == 1) {
+                    if (i == 0) continue;
                     if (i % 2 == 0) {
                         var li = document.createElement('li');
                         li.setAttribute('class', 'msg-li');
@@ -221,9 +223,9 @@ function insertMessageContent(messages, type) {
                         li.appendChild(msg_list[i - 1]);
                         msg_slider.prepend(li);
                     }
-                    
-                //짝수일 때  
-                }else{
+
+                    //짝수일 때  
+                } else {
                     if (i % 2 == 1) {
                         var li = document.createElement('li');
                         li.setAttribute('class', 'msg-li');
@@ -232,12 +234,30 @@ function insertMessageContent(messages, type) {
                         msg_slider.prepend(li);
                     }
 
-                    if(i== messages.length -1){
-                        if(type =='new'){
+                    if (i == messages.length - 1) {
+                        if (type == 'new') {
                             var new_span = document.createElement('span');
                             new_span.setAttribute('id', 'new');
                             new_span.innerHTML = 'new'
-                            msg_list[ messages.length -1].innerHTML +=  "  <sapn id='new'>new</sapn>"
+                            msg_list[messages.length - 1].innerHTML += "  <sapn id='new'>new</sapn>"
+
+                            switch (message.type) {
+                                case 'text':
+                                    endTime = new Date();
+                                    Measure.textMeasure.putArrivalTime(endTime)
+                                    //console.log(endTime +"###############");
+                                    break;
+                                case 'image':
+                                    endTime = new Date();
+                                    Measure.imageMeasure.putArrivalTime(endTime)
+                                    //console.log(endTime - startTime);
+                                    break;
+                                case 'audio':
+                                    endTime = new Date();
+                                    Measure.audioMeasure.putArrivalTime(endTime)
+                                    //console.log(endTime - startTime);
+                                    break;
+                            }
                         }
                     }
                 }
@@ -245,18 +265,22 @@ function insertMessageContent(messages, type) {
 
             }
             //홀수일 때 마지막 메시지만 li에 content 1개 삽입
-            if(messages.length %2==1){
+            if (messages.length % 2 == 1) {
                 var li = document.createElement('li');
                 li.setAttribute('class', 'msg-li');
                 li.appendChild(msg_list[0]);
                 msg_slider.appendChild(li);
-                 //새로온 메시지
-                if(type =='new'){
+                //새로온 메시지
+                if (type == 'new') {
                     var new_span = document.createElement('span');
                     new_span.setAttribute('id', 'new');
                     new_span.innerHTML = 'new'
-                    msg_list[ messages.length -1].innerHTML += "  <sapn id='new'>new</sapn>"
-                   // console.log('new_홀수', msg_list[0]);
+                    msg_list[messages.length - 1].innerHTML += "  <sapn id='new'>new</sapn>"
+
+                    endTime = new Date();
+                    Measure.audioMeasure.putArrivalTime(endTime)
+                    
+                    // console.log('new_홀수', msg_list[0]);
                 }
             }
 
@@ -267,12 +291,12 @@ function insertMessageContent(messages, type) {
                 msg_list[i].setAttribute('value', messages[i].msg_id);
             }
             msg_addEvent(msg_list.length);
-            if(msg_list.length%2==1)
-                totalSlides = (msg_list.length/2)+0.5;
-            else totalSlides = msg_list.length/2;
-            document.getElementById('msg_index').innerHTML =`- ${1}/${totalSlides} -`;
+            if (msg_list.length % 2 == 1)
+                totalSlides = (msg_list.length / 2) + 0.5;
+            else totalSlides = msg_list.length / 2;
+            document.getElementById('msg_index').innerHTML = `- ${1}/${totalSlides} -`;
         })
-       
+
 }
 
 
@@ -280,7 +304,7 @@ function insertMessageContent(messages, type) {
 function insertNewMessage() {
     mirror_db.select('*', 'message', `receiver = ${mirror_db.getId()}`)
         .then(messages => {
-           if(messages.length <=0) return;
+            if (messages.length <= 0) return;
             insertMessageContent(messages, 'new');
         })
 }
@@ -289,61 +313,61 @@ function insertNewMessage() {
 //소켓으로 통신
 
 var reply_btn = document.getElementById('reply_btn');
-reply_btn.onclick= () =>{reply_message();}
+reply_btn.onclick = () => { reply_message(); }
 
 // detail-message 창에서 바로 답장
 //소켓으로 통신
 function reply_message() {
     console.log('reply_message 들어옴')
-    console.log("replay text value: ",document.getElementById('reply_text').value)
+    console.log("replay text value: ", document.getElementById('reply_text').value)
 
-    if(mirror_db.getId()==null) return;
+    if (mirror_db.getId() == null) return;
     var receiver_id = document.getElementById('message-sender').getAttribute('value')
-    if(receiver_id == 0) return;
+    if (receiver_id == 0) return;
     //reciever 이름 알아오기
-    mirror_db.select('*', 'friend',`id=${mirror_db.getId()} and friend_id=${receiver_id}`)
-    .then((value) => {
-        if(value.length <=0) {
-            console.log('reply_message : freind디비에 없는 유저');
-            return;
-        }
-        //reciever의 접속 여부 알아내기
-        console.log('답장 받을 유저의 이름 ',(value[0].name));
-        axios({method:'post',url:'http://192.168.0.2:9000/get/connect', data:{id:receiver_id}})
-        .then((response) =>{
-           // console.log(response);
-           if(response.data.connect == 'fail'){
-                console.log('reply_message : 서버에서 연결여부 불러오기 오류');
+    mirror_db.select('*', 'friend', `id=${mirror_db.getId()} and friend_id=${receiver_id}`)
+        .then((value) => {
+            if (value.length <= 0) {
+                console.log('reply_message : freind디비에 없는 유저');
                 return;
-           }
-            //답장 전달     
-            var content = document.getElementById("reply_text").value; 
-            console.log('content 객체',document.getElementById('reply-text'))
-            console.log('response.connect',response.connect)
-
-            // var content = document.getElementById('reply-text').getAttribute('value');
-            // console.log('content',content)
-            var time = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
-            var buf = {
-                sender: mirror_db.getId(),
-                receiver: receiver_id,
-                content: content,
-                type: 'text',
-                send_time: time
             }
-            //상대가 접속 되어 있으면 mqtt로 전달
-            if(response.data.connect){
-               
-                client.publish(`${receiver_id}/connect_msg`, JSON.stringify(buf))
-               
-            //그렇지 않다면 서버 DB에 해당 메시지를 저장
-            }else{
-                //서버에 메시지를 저장하는 방법으로 메시지를 보냄
-                client.publish('server/send/msg', JSON.stringify(buf))
-            }
+            //reciever의 접속 여부 알아내기
+            console.log('답장 받을 유저의 이름 ', (value[0].name));
+            axios({ method: 'post', url: 'http://192.168.0.2:9000/get/connect', data: { id: receiver_id } })
+                .then((response) => {
+                    // console.log(response);
+                    if (response.data.connect == 'fail') {
+                        console.log('reply_message : 서버에서 연결여부 불러오기 오류');
+                        return;
+                    }
+                    //답장 전달     
+                    var content = document.getElementById("reply_text").value;
+                    console.log('content 객체', document.getElementById('reply-text'))
+                    console.log('response.connect', response.connect)
 
-        }).then(()=>{document.getElementById('reply_text').value = '';})
-    })
+                    // var content = document.getElementById('reply-text').getAttribute('value');
+                    // console.log('content',content)
+                    var time = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+                    var buf = {
+                        sender: mirror_db.getId(),
+                        receiver: receiver_id,
+                        content: content,
+                        type: 'text',
+                        send_time: time
+                    }
+                    //상대가 접속 되어 있으면 mqtt로 전달
+                    if (response.data.connect) {
+
+                        client.publish(`${receiver_id}/connect_msg`, JSON.stringify(buf))
+
+                        //그렇지 않다면 서버 DB에 해당 메시지를 저장
+                    } else {
+                        //서버에 메시지를 저장하는 방법으로 메시지를 보냄
+                        client.publish('server/send/msg', JSON.stringify(buf))
+                    }
+
+                }).then(() => { document.getElementById('reply_text').value = ''; })
+        })
 }
 
 
@@ -358,11 +382,11 @@ function msg_addEvent(length) {
     slideIndex = 0;
     //items
     slides = document.querySelectorAll('#msg-slider-wrap ul li');
-    if(length%2==1)
-        totalSlides = (length/2)+0.5;
-    else totalSlides = length/2;
+    if (length % 2 == 1)
+        totalSlides = (length / 2) + 0.5;
+    else totalSlides = length / 2;
     //number of slides
-  
+
     //get the slide width
     sliderWidth = slideWrapper.clientWidth;
     sliderHeight = slideWrapper.clientHeight
@@ -375,8 +399,8 @@ function msg_addEvent(length) {
     var slider = document.querySelector('#msg-slider-wrap ul#msg-slider');
     slider.style.width = sliderWidth * totalSlides + 'px';
 
-     // hover
-     slideWrapper.addEventListener('mouseover', function () {
+    // hover
+    slideWrapper.addEventListener('mouseover', function () {
         this.classList.add('active');
 
     });
@@ -404,14 +428,14 @@ function currentSlides(n) {
 
 function showSlides(n) {
     slideIndex = n;
-    console.log('slideIndex: ',slideIndex);
+    console.log('slideIndex: ', slideIndex);
     if (slideIndex == -1) {
         slideIndex = totalSlides - 1;
     } else if (slideIndex === totalSlides) {
         slideIndex = 0;
     }
-    document.getElementById('msg_index').innerHTML =`-${slideIndex+1}/${totalSlides}-`;
+    document.getElementById('msg_index').innerHTML = `-${slideIndex + 1}/${totalSlides}-`;
     slider.style.top = -(sliderHeight * slideIndex) + 'px';
 }
 
-module.exports = { initMessages, insertNewMessage};
+module.exports = { initMessages, insertNewMessage };

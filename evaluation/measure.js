@@ -35,9 +35,12 @@ class Measure {
 
   putDepartureTime(time) {
     this.departureTime.push(time);
+    console.log("################## measure start : "+time)
   }
   putArrivalTime(time) {
     this.arrivalTime.push(time);
+    console.log("################## measure end : "+time)
+    console.log("################## measure !!! "+ (time - this.departureTime[this.departureTime.length-1]).toString());
   }
 
   startExp() {
@@ -52,7 +55,9 @@ class Measure {
       }
     ]
     this.DATA_ROWS.push(EXP_ROW);
+    
     this.EXP_COUNT++;
+    
   }
 
   endExp() {
@@ -102,9 +107,15 @@ class Measure {
 
 };
 
+let loop = 100
+
+let audioMeasure = new Measure(loop, "오디오")
+let imageMeasure = new Measure(loop, "이미지")
+let textMeasure = new Measure(loop, "텍스트")
+
 
 // const measure = new Measure(10,"이미지")
 // measure.write()
-module.exports = Measure
+module.exports = {audioMeasure, imageMeasure, textMeasure}
 
 

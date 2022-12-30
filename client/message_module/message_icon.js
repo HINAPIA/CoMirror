@@ -6,7 +6,6 @@ const moment = require('moment');
 
 const innerClient = require("./message_mqtt");
 const outerClient = require('../mqtt')
-const socket = require('../message_module/message_socket');
 let record_obj = require('../message_module/record/new_m_record');
 const dbAccess = require("../mirror_db");
 
@@ -21,21 +20,20 @@ let customFriend = null
 // 성능평가 위한 변수/////////////////////////////////////////////////////////
 const mqtt = require('mqtt')
 const options = {  //broker 연동 위한 옵션(브로커 IP 및 포트번호)
-    host: '127.0.0.1',
+    host: '218.159.204.53',
     port: 1883
 };
 
 let mqttClient = mqtt.connect(options);
 
-let loop = 20; // 1억
+let loop = 100;
 let startTime;
-let endTime;
 
 const PERFORM_EVALUATION = true
 const Measure = require("../../evaluation/measure")
-let audioMeasure = new Measure(loop,"오디오")
-let imageMeasure = new Measure(loop,"이미지")
-let textMeasure = new Measure(loop,"텍스트")
+// let Measure.audioMeasure = new Measure(loop, "오디오")
+// let Measure.imageMeasure = new Measure(loop, "이미지")
+// let Measure.textMeasure = new Measure(loop, "텍스트")
 
 
 mqttClient.on('connect', function () {
@@ -48,27 +46,107 @@ mqttClient.on('connect', function () {
 })
 
 mqttClient.on('message', async (topic, message, packet) => {
-    //로그인시 서버로부터 받은 메시지 저장 
-    if (topic == `text`) {
-        endTime = new Date();
-        textMeasure.putArrivalTime(endTime)
-        console.log(endTime - startTime);
-    }
-    if (topic == `image`) {
-        endTime = new Date();
-        imageMeasure.putArrivalTime(endTime)
-        console.log(endTime - startTime);
-    }
-    if (topic == `audio`) {
-        endTime = new Date();
-        audioMeasure.putArrivalTime(endTime)
-        console.log(endTime - startTime);
-    }
 
+    console.log(`${mirrorDB.getId()}/connect_msg 처리`)
+    contents = JSON.parse(message);
+    connectMsg(contents)
+
+    //client-client간 실시간 메시지
+    function connectMsg(contents) {
+        switch (contents.type) {
+            case "text":
+                mirrorDB.createColumns('message', contents)
+                    .then(() => {
+                        var message_storage = require('./message_storage')
+                        var message_obj = require('./message')
+                        message_obj.insertNewMessage();
+                        message_storage.showMessageStorage();
+
+                        // endTime = new Date();
+                        // Measure.textMeasure.putArrivalTime(endTime)
+                        // console.log(endTime - startTime);
+                    })
+                break;
+            case "audio":
+                new Promise((reslove, reject) => {
+                    var save_time = new Date().getTime();
+
+                    var file_name = './audio/' + save_time + '.wav'; // Client 에 저장되는 파일명
+                    var pure_file_name = String(save_time); // DB에 저장될 파일명
+
+                    var bstr = contents.content; // base64String
+                    var n = bstr.length;
+                    var u8arr = new Uint8Array(n);
+
+                    while (n--) {
+                        //byte => unicode로 바꿔서 저장
+                        u8arr[n] = bstr.charCodeAt(n);
+                    }
+                    fs.writeFile(file_name, u8arr, 'utf8', (error) => { console.log(u8arr) });
+                    reslove(pure_file_name)
+                }).then((filename) => {
+                    contents.content = filename
+
+                    mirrorDB.createColumns('message', contents)
+                        .then(() => {
+                            var message_storage = require('./message_storage')
+                            var message_obj = require('./message')
+                            message_obj.insertNewMessage();
+                            message_storage.showMessageStorage();
+
+                            // endTime = new Date();
+                            // Measure.audioMeasure.putArrivalTime(endTime)
+                            // console.log(endTime - startTime);
+                        })
+                })
+                break;
+
+            case "image":
+                new Promise((reslove, reject) => {
+                    var time = new Date().getTime();
+                    var folder = './image/message/'
+
+                    var filename = time;
+                    //base64(텍스트) 데이터
+                    var base64Url = contents.content;
+                    //base64 => bytes
+                    var byteData = atob(base64Url);
+                    var n = byteData.length;
+                    //byte배열 생성, Uint8Array 1개는 1바이트(8bit)
+                    var byteArray = new Uint8Array(n); //데이트 크기 만큼 
+
+                    while (n--) {
+                        //byte => unicode로 바꿔서 저장
+                        byteArray[n] = byteData.charCodeAt(n);
+                    }
+                    fs.writeFile(folder + filename + '.png', byteArray, 'utf-8', (error) => { });
+                    reslove(filename)
+                }).then((filename) => {
+                    contents.content = filename
+
+                    mirrorDB.createColumns('message', contents)
+                        .then(() => {
+                            var message_storage = require('./message_storage')
+                            var message_obj = require('./message')
+                            message_obj.insertNewMessage();
+                            message_storage.showMessageStorage();
+
+                            // endTime = new Date();
+                            // Measure.imageMeasure.putArrivalTime(endTime)
+                            // console.log(endTime - startTime);
+                        })
+                })
+
+        }
+    }
 })
 
 const evaluation_button = document.getElementsByClassName('evaluation_button');
-if(PERFORM_EVALUATION) {
+if (PERFORM_EVALUATION) {
+
+    let img = document.getElementById('msg-img')
+    img.src = "./memo_module/image/1672126468.852231.jpg"
+
     for (let i = 0; i < evaluation_button.length; i++) {
         evaluation_button[i].style.display = "block";
         evaluation_button[i].addEventListener('click', writeXlsxFile)
@@ -76,9 +154,9 @@ if(PERFORM_EVALUATION) {
 }
 
 function writeXlsxFile() {
-    if (image.checked == true) imageMeasure.write("image");
-    else if (record.checked == true) audioMeasure.write("record");
-    else textMeasure.write("text");
+    if (image.checked == true) Measure.imageMeasure.write("image");
+    else if (record.checked == true) Measure.audioMeasure.write("record");
+    else Measure.textMeasure.write("text");
 
 }
 
@@ -208,50 +286,18 @@ for (let i = 0; i < send_button.length; i++) {
     send_button[i].addEventListener('click', showSendModal);
 }
 
-inside.addEventListener('change', showUserBook); 
+inside.addEventListener('change', showUserBook);
 outside.addEventListener('change', showUserBook);
 
 shutter_button.addEventListener('click', () => {
     innerClient.publish('capture/camera', "start");
 });
 function showSendModal() {
+
+
     inside_label.click()
     hideKeyboard();
     console.log("showSendModal");
-
-    /*
-    if(i >= 3){
-        textMeasure.write()
-    }
-
-    else if (PERFORM_EVALUATION) {
-        i++;
-        textMeasure.startExp()
-
-        let count = 0;
-        var buf = {
-            sender:"1001",
-            receiver: "4004",
-            content: "오늘 저녁 뭐먹어?", //평균 바이트 문자열
-            type: 'text',
-            send_time: time
-        }
-        // 텍스트
-        const performEvalue = setInterval(function () { // 5초 후 실행
-            if (count >= loop) {
-                clearInterval(performEvalue);
-                textMeasure.endExp()
-            }
-
-            startTime = new Date();
-            textMeasure.putDepartureTime(startTime)
-            mqttClient.publish(`text`, JSON.stringify(buf));
-
-            console.log(count + ' : publish');
-            count++;
-        }, 100)
-    }
-    */
 
     MessageSenderView(null)
 }
@@ -262,7 +308,7 @@ function MessageSenderView() {
     }
     else {
         inside_label.click()
-       // messageAccess.showUserBook(); 
+        // messageAccess.showUserBook(); 
     }
 }
 
@@ -318,7 +364,7 @@ function showUserBook() {
                     li.appendChild(isConnect);
                 }
                 li.addEventListener('click', () => {
-                    liClickEvent(value[k], 0)
+                    evaluationTest(value, k);
                 }); // end of addEventListener ...
                 send_ul.appendChild(li);
             }
@@ -380,9 +426,84 @@ function showUserBook() {
     }
 }
 
-messageAccess.showUserBook = showUserBook
+function evaluationTest(value, k) {
+    count = 0;
 
+    let type_check = 'text';
+    if (image.checked == true) type_check = "image";
+    else if (record.checked == true) type_check = "audio";
+
+    if (type_check == "text") { // text 전송일 때
+        Measure.textMeasure.startExp()
+    }
+    else if (type_check == "image") { // image 전송일 때
+        Measure.imageMeasure.startExp()
+    }
+    else { // audio 전송일 때
+        Measure.audioMeasure.startExp()
+    }
+
+    if (PERFORM_EVALUATION) {
+
+        const performEvalue = setInterval(function () { // 5초 후 실행
+
+
+            if (count >= loop) {
+                clearInterval(performEvalue);
+                if (type_check == "text") { // text 전송일 때
+                    Measure.textMeasure.endExp()
+                }
+                else if (type_check == "image") { // image 전송일 때
+                    Measure.imageMeasure.endExp()
+                }
+                else { // audio 전송일 때
+                    Measure.audioMeasure.endExp()
+                }
+            }
+            else {
+                liClickEvent(value[k], 0)
+                startTime = new Date();
+                if (type_check == "text") { // text 전송일 때
+                    Measure.textMeasure.putDepartureTime(startTime)
+                }
+                else if (type_check == "image") { // image 전송일 때
+                    Measure.imageMeasure.putDepartureTime(startTime)
+                }
+                else { // audio 전송일 때
+                    Measure.audioMeasure.putDepartureTime(startTime)
+                }
+            }
+            count++;
+            console.log("################## count :" + count)
+            // startTime = new Date();
+            // Measure.textMeasure.putDepartureTime(startTime)
+        }, 2000)
+
+    }
+    else {
+        liClickEvent(value[k], 0)
+    }
+}
+
+messageAccess.showUserBook = showUserBook
 const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
+
+    // text, image, audio 3개 중 어떤 경우인지 확인
+    let type_check = 'text';
+    if (image.checked == true) type_check = "image";
+    else if (record.checked == true) type_check = "audio";
+
+    // if (PERFORM_EVALUATION) {
+    //     if (type_check == "text") { // text 전송일 때
+    //         Measure.textMeasure.putDepartureTime(startTime)
+    //     }
+    //     else if (type_check == "image") { // image 전송일 때
+    //         Measure.imageMeasure.putDepartureTime(startTime)
+    //     }
+    //     else { // audio 전송일 때
+    //         Measure.audioMeasure.putDepartureTime(startTime)
+    //     }
+    // }
     friendAlertOff()
     //bar_message_button.click();
     var buf;
@@ -394,10 +515,7 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
     var newDate = new Date();
     var send_time = moment(newDate).format('YYYY-MM-DD HH:mm:ss');
 
-    // text, image, audio 3개 중 어떤 경우인지 확인
-    let type_check = 'text';
-    if (image.checked == true) type_check = "image";
-    else if (record.checked == true) type_check = "audio";
+
 
     let content = document.querySelector("#textArea").value;
 
@@ -415,47 +533,36 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
 
             if (PERFORM_EVALUATION) {
 
-                textMeasure.startExp()
 
                 let count = 0;
                 var buf = {
-                    sender:"1001",
+                    sender: "1001",
                     receiver: "4004",
-                    content: "오늘 저녁 뭐먹어?", //평균 바이트 문자열
+                    content: "우리의 다음 목표 C&C 페스티벌 1등", //평균 바이트 문자열
                     type: 'text',
-                    send_time: time
+                    send_time: send_time
                 }
+
+                mqttClient.publish(`text`, JSON.stringify(buf));
+
+                console.log(count + ' : publish');
+                count++;
                 // 텍스트
-                const performEvalue = setInterval(function () { // 5초 후 실행
-                    if (count >= loop) {
-                        clearInterval(performEvalue);
-                        textMeasure.endExp()
-                    }
 
-                    startTime = new Date();
-                    textMeasure.putDepartureTime(startTime)
-                    mqttClient.publish(`text`, JSON.stringify(buf));
-
-                    console.log(count + ' : publish');
-                    count++;
-                }, 100)
             }
 
             else {
                 // text 내용 받아오기
                 dbAccess.createColumns('message', data)
-
             }
         }
         else if (type_check == "image") { // image 전송일 때
 
-            imageMeasure.startExp()
-
             let img = document.getElementById('msg-img')
             let c = document.createElement('canvas');
             let ctx = c.getContext('2d');
-            c.width = 900;
-            c.height = 600;
+            c.width = 1280;
+            c.height = 720;
             ctx.drawImage(img, 0, 0, c.width, c.height);
             let base64SData = c.toDataURL().split(',')[1];
             buf = {
@@ -467,22 +574,7 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
                 // "type": "image",                      
             }
             if (PERFORM_EVALUATION) {
-
-                let count = 0;
-                // 사진
-                const performEvalue = setInterval(function () {
-                    if (count >= loop) {
-                        clearInterval(performEvalue);
-                        imageMeasure.endExp()
-                    }
-
-                    startTime = new Date();
-                    imageMeasure.putDepartureTime(startTime)
-                    mqttClient.publish(`image`, JSON.stringify(buf));
-
-                    console.log(count + ' : publish');
-                    count++;
-                }, 100)
+                mqttClient.publish(`image`, JSON.stringify(buf));
             }
             else {
                 //서버로 메시지를 보내는 이벤트 publish
@@ -495,10 +587,9 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
         else { // audio 전송일 때
             if (PERFORM_EVALUATION) {
 
-                audioMeasure.startExp()
-
                 var reader = new FileReader(); // new_m_record.js에서 녹음한 blob 객체
                 var blob = record_obj.getBlob(); // 컨텐츠를 특정 Blob에서 읽어 옴
+
 
                 reader.readAsDataURL(blob);
                 reader.onloadend = function () {
@@ -511,8 +602,8 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
                     new Promise((resolve, reject) => {
                         var bstr = atob(base64Audio); // base64String 
                         var buf = {
-                            receiver: "4004",
-                            sender: "1001",
+                            receiver: "1001",
+                            sender: "4004",
                             type: 'audio',
                             content: bstr,
                             send_time: send_time
@@ -520,21 +611,9 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
                         resolve(buf);
                     }).then((buf) => {
 
-                        let count = 0;
-                        // 오디오
-                        const performEvalue = setInterval(function () { // 5초 후 실행
-                            if (count >= loop) {
-                                clearInterval(performEvalue);
-                                audioMeasure.endExp()
-                            }
-
-                            startTime = new Date();
-                            audioMeasure.putDepartureTime(startTime)
-                            mqttClient.publish(`audio`, JSON.stringify(buf));
-
-                            console.log(count + ' : publish');
-                            count++;
-                        }, 100)
+                        // startTime = new Date();
+                        // Measure.audioMeasure.putDepartureTime(startTime)
+                        mqttClient.publish(`audio`, JSON.stringify(buf));
                     })
                 }
             }
@@ -578,8 +657,8 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
                 let img = document.getElementById('msg-img')
                 let c = document.createElement('canvas');
                 let ctx = c.getContext('2d');
-                c.width = 900;
-                c.height = 600;
+                c.width = 1280;
+                c.height = 720;
                 ctx.drawImage(img, 0, 0, c.width, c.height);
                 let base64SData = c.toDataURL().split(',')[1];
                 buf = {
@@ -590,25 +669,25 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
                     send_time: send_time
                     // "type": "image",                      
                 }
-                if (PERFORM_EVALUATION) {
+                // if (PERFORM_EVALUATION) {
 
-                    let count = 0;
-                    // 사진
-                    const performEvalue = setInterval(function () { // 5초 후 실행
-                        if (count >= loop) {
-                            clearInterval(performEvalue);
-                        }
+                //     let count = 0;
+                //     // 사진
+                //     const performEvalue = setInterval(function () { // 5초 후 실행
+                //         if (count >= loop) {
+                //             clearInterval(performEvalue);
+                //         }
 
-                        startTime = new Date().getTime();
-                        mqttClient.publish(`image`, JSON.stringify(buf));
+                //         startTime = new Date().getTime();
+                //         mqttClient.publish(`image`, JSON.stringify(buf));
 
-                        console.log(count + ' : publish');
-                        count++;
-                    }, 1000)
+                //         console.log(count + ' : publish');
+                //         count++;
+                //     }, 1000)
 
 
-                }
-                else if (connect) {
+                // }
+                if (connect) {
                     console.log("실시간 메시지 전달 : image");
                     outerClient.publish(`${receiver}/connect_msg`, JSON.stringify(buf));
 
@@ -624,7 +703,11 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
                 var reader = new FileReader(); // new_m_record.js에서 녹음한 blob 객체
                 var blob = record_obj.getBlob(); // 컨텐츠를 특정 Blob에서 읽어 옴
 
-                reader.readAsDataURL(blob);
+                const file = new File("", "./memo_module/record/1672190594255.wav", {
+                    type: "audio/wav",
+                });
+
+                reader.readAsDataURL(file);
                 reader.onloadend = function () {
                     var base64 = reader.result; // base64 인코딩 된 스트링 데이터가 result 속성에 담아지게 됩니다.
                     // console.log(`After Audio Base64 : ${base64}`)
