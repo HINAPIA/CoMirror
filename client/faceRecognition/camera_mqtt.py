@@ -6,7 +6,7 @@ import json
 import camera
 import os
 from datetime import datetime
-
+import time
 # 미러 바뀔 때마다 수동으로 설정해줘야 한다
 mirror_id = 100
 broker_ip = "192.168.0.2" # 현재 이 컴퓨터를 브로커로 설정
@@ -21,9 +21,12 @@ delete_login_flag = False
 close_flag = False
 stopFlag = False
 id = 0
-login_img_count = 20
-signup_img_count = 50
+login_img_count = 4
+signup_img_count = 20
 
+
+start = 0
+end = 0
 curDir = os.path.dirname(os.path.realpath(__file__))
     #curDir = '.' + os.path.sep + 'faceRecognition'
 os.chdir(curDir)
@@ -70,14 +73,17 @@ def on_message(client, userdata, msg):
         camera.onCam()
 
     elif(msg.topic == f'{mirror_id}/login/camera'):
+        global start
         #if(str(message) == str(mirror_id)):
            # print("로그인 시작 : " + msg.topic)
         #camera.onCam()
+         
         global loginCamera_flag
         loginCamera_flag = True
             
     elif(msg.topic == f'{mirror_id}/createAccount/camera'):
         camera.onCam()
+        start = time.time()     
         print("topic : " + msg.topic)
         m_id = (str)(message)[0:3]
         print('m_id:' +m_id)
@@ -136,6 +142,9 @@ while True :
         # 카메라로 사진 찍어서 얼굴부분만 크롭해서 저장
         dir_name = os.path.join('face','login')
         if(capture_for_login(dir_name)):
+             
+            
+            # 시간 측정 끝
             loginCamera_flag = False 
     if(exist_flag):
         dir_name = os.path.join('face','login')
@@ -167,6 +176,8 @@ while True :
                 # 서버에 보냄   
                 client.publish('createAccount/image', bytearray(str(mirror_id), 'utf-8') + imageByte)
             id = 0
+            end = time.time()
+            print(f'사진 크기에 따른 얼굴인식 client : {end - start}')
             createAccountCamera_flag = False
     if (stopFlag):
         break

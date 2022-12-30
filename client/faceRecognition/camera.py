@@ -7,7 +7,7 @@ import sys
 import os
 import os.path
 import platform
-
+import time
 
 # 미러 바뀔 때마다 수동으로 설정해줘야 한다
 mirror_id = 100
@@ -30,13 +30,12 @@ osName = platform.system()
 #Linux
 cam = cv2.VideoCapture(cv2.CAP_V4L)
 
-cam.set(cv2.CAP_PROP_FRAME_WIDTH, 500)
-cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+cam.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
+cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
 #cam = cv2.VideoCapture(cv2.CAP_V4L2)
 print("os" + osName)
 
-face_classifier = cv2.CascadeClassifier(
-    cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+face_classifier = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
 
 
@@ -44,8 +43,8 @@ def onCam():
     global cam
     if (cam == None):
         cam = cv2.VideoCapture(cv2.CAP_V4L2)
-        cam.set(cv2.CAP_PROP_FRAME_WIDTH, 500)
-        cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        cam.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
+        cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
             # #리눅스
             # #cam = cv2.VideoCapture(cv2.CAP_V4L2)
             # #윈도우
@@ -91,13 +90,17 @@ def createCropImage(userName, dir_path, countN):
         while True:
             ret, frame = cam.read()
             if face_extractor(frame) is not None:
+                save_start = time.time()
                 count += 1
                 face = cv2.resize(face_extractor(frame), (160, 160))
+                crop_end = time.time()
                 face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
                 file_name_path = str(count) + '.jpg'
                 #크롭된 이미지 저장
                 #face/login/user
                 cv2.imwrite(dir_path + '/'+file_name_path, face)
+                save_end = time.time()
+                print(f'{save_end - save_start}, {crop_end - save_start}')
             else:
                 client.publish(f'{mirror_id}/error', 'notFound')
                 print("Face not Found")

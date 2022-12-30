@@ -8,7 +8,6 @@ from createAccount import reTrain
 import os
 from keras.models import load_model
 import shutil
-import math
 import time
 
 
@@ -31,8 +30,11 @@ existUser = ''
 delete_id = ''
 user_id = 0
 count= 0
-login_img_count=20
-signup_img_count = 50
+login_img_count=4
+signup_img_count = 20
+
+start = 0
+end = 0
 
 def on_connect(client, userdata, flag, rc):
     print("Connect with result code:"+ str(rc))
@@ -56,7 +58,7 @@ def on_message(client, userdata, msg):
    # print("receiving ", msg.topic, " ", str(msg.payload))
 
     global user_id
-
+    global start
 
     if(msg.topic == 'reTrain'): 
         mirror_id = int(msg.payload)
@@ -118,9 +120,11 @@ def on_message(client, userdata, msg):
 
     if(msg.topic == 'createAccount/image'):
         if(flag):
+            # 사진을 받아서 훈련 시간
+            start = time.time() 
             mirror_id = msg.payload[0:3].decode('utf-8')
             file =msg.payload[3:]
-            count = (count +1)%50
+            count = (count +1)%signup_img_count
             file_path = os.path.join('mirror', str(mirror_id), 'train', str(user_id) )
             #폴더 생성
             if (os.path.exists(file_path)):
@@ -177,23 +181,21 @@ while True :
     if (create_account_flag):
         print('while - createAccount')
         # 1은 pi 에서 받아온 유저아이디
-        start = time.time()       
+              
         check = createAccoount(embeddingModel,mirror_id)
         end = time.time()
-        print(f"{end - start:.5f} sec")
+        print(f"이미지 크기에 따른 서버 : {end - start:.5f} sec")
         client.publish(f'{mirror_id}/createAccount/check', user_id)
         create_account_flag = False
 
     if(reTrain_flag):
         check_time = []
-        for i in range(10):
-            start = time.time()       
-            reTrain(embeddingModel, mirror_id)
-            end = time.time()
-            check_time.append(end - start)
+
+        start = time.time()       
+        reTrain(embeddingModel, mirror_id)
+        end = time.time()
+        check_time.append(end - start)
               
-        for i in range(10):
-            print(f"{check_time[i]:.5f}")  
         client.publish(f'{mirror_id}/reTrain/check', mirror_id)
         reTrain_flag = False
 
