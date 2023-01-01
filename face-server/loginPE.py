@@ -225,11 +225,8 @@ def make_csv(file_name, field_name, datas):
 mirror_id = str(400)
 #embedding_dataset = os.path.join('dataPE',mirror_id, 'files','login-embeddings.npz')
 #login_PE(embeddingModel, "400")
-<<<<<<< Updated upstream
-class_probability_evaluation(40, 10, 5, 400)
-=======
+
 class_probability_evaluation(20, 10, 1, 400)
 class_probability_evaluation(20, 10, 2, 400)
 class_probability_evaluation(20, 10, 3, 400)
 class_probability_evaluation(20, 10, 4, 400)
->>>>>>> Stashed changes
