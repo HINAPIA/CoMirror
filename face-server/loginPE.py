@@ -132,7 +132,7 @@ def user_check_PE(count, embedding_dataset, mirror_id):
     print('데이터셋:  테스트 %d개' % (testX.shape[0]))
     #모델 적합
     #모델 파일은 새로운 유저가 회원가입 시 갱신되며 만들어진다
-    model_file = os.path.join('dataPE',mirror_id,'files','model.pkl')
+    model_file = os.path.join('dataPE',mirror_id,'files','model','model.pkl')
     if not os.path.isfile(model_file):
         print('모델이 없습니다')
         return
@@ -178,7 +178,7 @@ def class_probability_evaluation(train_cnt, repeat_cnt, select_cnt, mirror_id):
     out_encoder = LabelEncoder()
     out_encoder.fit(testY)
     #사용할 얼굴인식 모델
-    model_folder = os.path.join("dataPE",mirror_id,"files")
+    model_folder = os.path.join("dataPE",mirror_id,"files","model")
     model_name = "model"+str(train_cnt)+".pkl"
     model = joblib.load(os.path.join(model_folder,model_name))
     
@@ -224,4 +224,4 @@ def make_csv(file_name, field_name, datas):
 mirror_id = str(400)
 #embedding_dataset = os.path.join('dataPE',mirror_id, 'files','login-embeddings.npz')
 #login_PE(embeddingModel, "400")
-class_probability_evaluation(20, 10000, 1, 400)
+class_probability_evaluation(40, 10, 5, 400)
