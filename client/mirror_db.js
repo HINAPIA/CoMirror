@@ -3,7 +3,7 @@
 let dbAccess = {};
 let id;
 
-var mirror_id = 400; 
+var mirror_id = 100; 
 
 
 
@@ -168,35 +168,35 @@ const addUser = (name) => new Promise((resolve, reject) => {
 
     // user table 제작에 필요한 column을 데이터 객체로 형성
     var data = { name: name, mirror_id: mirror_id};
-
+    resolve(1000);
     // user 행 제작
-    createColumns('user', data)
-        .then(result => {
-            if (result) {
-                selectColumns('id', 'user',`name='${name}'`)
-                    .then(value => {
-                        console.log('dv: ' + parseInt(value[value.length - 1].id));
+    // createColumns('user', data)
+    //     .then(result => {
+    //         if (result) {
+    //             selectColumns('id', 'user',`name='${name}'`)
+    //                 .then(value => {
+    //                     console.log('dv: ' + parseInt(value[value.length - 1].id));
 
-                        var time = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
-                        contents = { // 인자로 보낼 데이터
-                            receiver: value[value.length - 1].id,
-                            sender: 1001,
-                            content: "안녕하세요",
-                            type: 'text',
-                            send_time: time
-                        }
-                        createColumns('message', contents);
-                        createColumns('friend', {id:value[value.length - 1].id,name:"박채원",friend_id:"1001" })
-                        createColumns('memo', {id: value[value.length - 1].id, content: "따듯한 날엔 라떼", 
-                                        store: "0", delete_time: time, type: "text", time: time })
+    //                     var time = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+    //                     contents = { // 인자로 보낼 데이터
+    //                         receiver: value[value.length - 1].id,
+    //                         sender: 1001,
+    //                         content: "안녕하세요",
+    //                         type: 'text',
+    //                         send_time: time
+    //                     }
+    //                     createColumns('message', contents);
+    //                     createColumns('friend', {id:value[value.length - 1].id,name:"박채원",friend_id:"1001" })
+    //                     createColumns('memo', {id: value[value.length - 1].id, content: "따듯한 날엔 라떼", 
+    //                                     store: "0", delete_time: time, type: "text", time: time })
                       
-                        resolve(String(value[value.length - 1].id));
-                    });
-            }
-            else {
-                reject(null);
-            }
-        });
+    //                     resolve(String(value[value.length - 1].id));
+    //                 });
+    //         }
+    //         else {
+    //             reject(null);
+    //         }
+    //     });
         
     });
 
