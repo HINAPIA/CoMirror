@@ -20,7 +20,7 @@ let customFriend = null
 // 성능평가 위한 변수/////////////////////////////////////////////////////////
 const mqtt = require('mqtt')
 const options = {  //broker 연동 위한 옵션(브로커 IP 및 포트번호)
-    host: '218.159.204.53',
+    host: '192.168.0.2',
     port: 1883
 };
 
@@ -145,7 +145,7 @@ const evaluation_button = document.getElementsByClassName('evaluation_button');
 if (PERFORM_EVALUATION) {
 
     let img = document.getElementById('msg-img')
-    img.src = "./memo_module/image/1672126468.852231.jpg"
+    img.src = "./memo_module/image/test.jpg"
 
     for (let i = 0; i < evaluation_button.length; i++) {
         evaluation_button[i].style.display = "block";
@@ -425,7 +425,7 @@ function showUserBook() {
         })
     }
 }
-
+let count = 0;
 function evaluationTest(value, k) {
     count = 0;
 
@@ -477,7 +477,7 @@ function evaluationTest(value, k) {
             console.log("################## count :" + count)
             // startTime = new Date();
             // Measure.textMeasure.putDepartureTime(startTime)
-        }, 2000)
+        }, 3000)
 
     }
     else {
@@ -515,8 +515,6 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
     var newDate = new Date();
     var send_time = moment(newDate).format('YYYY-MM-DD HH:mm:ss');
 
-
-
     let content = document.querySelector("#textArea").value;
 
     const data = { // 인자로 보낼 데이터
@@ -533,20 +531,17 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
 
             if (PERFORM_EVALUATION) {
 
-
-                let count = 0;
                 var buf = {
                     sender: "1001",
                     receiver: "4004",
-                    content: "우리의 다음 목표 C&C 페스티벌 1등", //평균 바이트 문자열
+                    content: count+": 우리의 다음 목표 C&C 페스티벌 1등", //평균 바이트 문자열
                     type: 'text',
                     send_time: send_time
                 }
 
                 mqttClient.publish(`text`, JSON.stringify(buf));
 
-                console.log(count + ' : publish');
-                count++;
+                //console.log(count + ' : publish');
                 // 텍스트
 
             }
@@ -566,8 +561,8 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
             ctx.drawImage(img, 0, 0, c.width, c.height);
             let base64SData = c.toDataURL().split(',')[1];
             buf = {
-                receiver: "1001",
-                sender: "4004",
+                receiver: "4004",
+                sender: "1001",
                 type: 'image',
                 content: base64SData,
                 send_time: send_time
@@ -602,8 +597,8 @@ const liClickEvent = (value, send_option) => new Promise((resolve, reject) => {
                     new Promise((resolve, reject) => {
                         var bstr = atob(base64Audio); // base64String 
                         var buf = {
-                            receiver: "1001",
-                            sender: "4004",
+                            receiver: "4004",
+                            sender: "1001",
                             type: 'audio',
                             content: bstr,
                             send_time: send_time

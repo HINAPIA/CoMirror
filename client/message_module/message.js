@@ -278,7 +278,7 @@ function insertMessageContent(messages, type) {
                     msg_list[messages.length - 1].innerHTML += "  <sapn id='new'>new</sapn>"
 
                     endTime = new Date();
-                    Measure.audioMeasure.putArrivalTime(endTime)
+                    Measure.imageMeasure.putArrivalTime(endTime)
                     
                     // console.log('new_홀수', msg_list[0]);
                 }
