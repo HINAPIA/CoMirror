@@ -22,7 +22,7 @@ close_flag = False
 stopFlag = False
 id = 0
 login_img_count = 4
-signup_img_count = 20
+signup_img_count = 40
 
 
 start = 0
@@ -176,8 +176,7 @@ while True :
                 # 서버에 보냄   
                 client.publish('createAccount/image', bytearray(str(mirror_id), 'utf-8') + imageByte)
             id = 0
-            end = time.time()
-            print(f'사진 크기에 따른 얼굴인식 client : {end - start}')
+
             createAccountCamera_flag = False
     if (stopFlag):
         break

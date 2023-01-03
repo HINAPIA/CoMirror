@@ -37,8 +37,6 @@ print("os" + osName)
 
 face_classifier = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
-
-
 def onCam():
     global cam
     if (cam == None):
@@ -100,7 +98,7 @@ def createCropImage(userName, dir_path, countN):
                 #face/login/user
                 cv2.imwrite(dir_path + '/'+file_name_path, face)
                 save_end = time.time()
-                print(f'{save_end - save_start}, {crop_end - save_start}')
+                print(f'{save_end - save_start}')
             else:
                 client.publish(f'{mirror_id}/error', 'notFound')
                 print("Face not Found")

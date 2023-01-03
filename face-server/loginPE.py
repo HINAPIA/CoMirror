@@ -19,14 +19,14 @@ import os
 import os.path
 from sklearn.metrics import accuracy_score
 import random
-import csv
+
 curDir = os.path.dirname(os.path.realpath(__file__))
 os.chdir(curDir)
 embeddingModel = load_model('facenet_keras.h5')
 
   
 # 얼굴 학습
-def model_fit_PE(embedding_file_name, mirror_id):
+def model_fit_PE(embedding_file_name):
 
     # 얼굴 임베딩 불러오기
     data = load(embedding_file_name)
@@ -41,7 +41,7 @@ def model_fit_PE(embedding_file_name, mirror_id):
     trainy = out_encoder.transform(trainy)
     # 모델 적합
 
-    model_file = os.path.join('dataPE', mirror_id,'files','model.pkl')
+    model_file = os.path.join('dataPE','files','model.pkl')
     #만들어진 모델이 없다면 새롭게 만든다
     model = SVC(kernel='linear', probability=True)
     model.fit(trainX, trainy)
@@ -56,7 +56,7 @@ def model_fit_PE(embedding_file_name, mirror_id):
     print('정확도: 훈련=%.3f' % (score_train*100))
 
     # 테스트 데이터셋에서 임의의 예제에 대한 테스트 모델
-    for i in range(20):
+    for i in range(40):
         selection = choice([i for i in range(trainX.shape[0])])
         random_face_pixels = trainX_faces[selection]
         random_face_emb = trainX[selection]
@@ -87,7 +87,7 @@ def reTrain_PE(embeddingModel, mirror_id):
     newTrainX, trainy = embedding(embeddingModel, folder_path+os.path.sep+dataset_file_name)
     numpy.savez_compressed(folder_path  + os.path.sep+'trainfaces-embeddings.npz', newTrainX, trainy )
     # 모델 학습
-    model_fit_PE(folder_path  + os.path.sep+ 'trainfaces-embeddings.npz', mirror_id)
+    model_fit_PE(folder_path  + os.path.sep+ 'trainfaces-embeddings.npz')
 
 
 def login_PE(embeddingModel, mirror_id):
@@ -209,48 +209,12 @@ def class_probability_evaluation(train_cnt, repeat_cnt, select_cnt, mirror_id):
     data = ['','','',recognition_prob_sum/repeat_cnt, class_prob_sum/repeat_cnt]
     datas.append(data)
     field_name = ['회원가입 사진 장 수', '로그인 사진 장 수', '로그인 회차', '인식률', '분류율']
-    make_csv('face_recog.csv', field_name, datas)
+    #evaluation_test.make_csv('face_recog.csv', field_name, datas)
 
 
-# csv 파일 생성
-def make_csv(file_name, field_name, datas):
-    file_path = './csv/'+file_name
-    with open(file_path, 'a', newline='') as f:
-        write = csv.writer(f)
-        write.writerow(field_name)
-        write.writerows(datas)
-    f.close
+
 
 
 mirror_id = str(400)
 #embedding_dataset = os.path.join('dataPE',mirror_id, 'files','login-embeddings.npz')
 #login_PE(embeddingModel, "400")
-class_probability_evaluation(2, 10, 1, 400)
-class_probability_evaluation(2, 10, 2, 400)
-class_probability_evaluation(2, 10, 4, 400)
-class_probability_evaluation(2, 10, 10, 400)
-
-class_probability_evaluation(4, 10, 1, 400)
-class_probability_evaluation(4, 10, 2, 400)
-class_probability_evaluation(4, 10, 4, 400)
-class_probability_evaluation(4, 10, 10, 400)
-
-class_probability_evaluation(10, 10, 1, 400)
-class_probability_evaluation(10, 10, 2, 400)
-class_probability_evaluation(10, 10, 4, 400)
-class_probability_evaluation(10, 10, 10, 400)
-
-class_probability_evaluation(20, 10, 1, 400)
-class_probability_evaluation(20, 10, 2, 400)
-class_probability_evaluation(20, 10, 4, 400)
-class_probability_evaluation(20, 10, 10, 400)
-
-class_probability_evaluation(30, 10, 1, 400)
-class_probability_evaluation(30, 10, 2, 400)
-class_probability_evaluation(30, 10, 4, 400)
-class_probability_evaluation(30, 10, 10, 400)
-
-class_probability_evaluation(40, 10, 1, 400)
-class_probability_evaluation(40, 10, 2, 400)
-class_probability_evaluation(40, 10, 4, 400)
-class_probability_evaluation(40, 10, 10, 400)
