@@ -109,14 +109,14 @@ def login_PE(embeddingModel, mirror_id):
 
     embedding_dataset = os.path.join('dataPE',mirror_id, 'files','login-embeddings.npz')
     for i in range(100):
-        sum += user_check_PE(i, embedding_dataset, "400")
+        sum += user_check_PE( embedding_dataset, "400")
 
     print('****최종 정확도****: %.3f' % (sum/100.0))
     print()
 
 
 # 얼굴 인식
-def user_check_PE(count, embedding_dataset, mirror_id):
+def user_check_PE( embedding_dataset, modelFile,valid_count):
     sum_class_probability = 0
     # pre_embedding_file= load(os.path.join('dataPE', mirror_id, 'files','trainfaces-embeddings.npz'))
     # label_y = pre_embedding_file['arr_1']
@@ -132,26 +132,29 @@ def user_check_PE(count, embedding_dataset, mirror_id):
     print('데이터셋:  테스트 %d개' % (testX.shape[0]))
     #모델 적합
     #모델 파일은 새로운 유저가 회원가입 시 갱신되며 만들어진다
-    model_file = os.path.join('dataPE',mirror_id,'files','model','model.pkl')
-    if not os.path.isfile(model_file):
+    print(modelFile)
+    if not os.path.isfile(modelFile):
         print('모델이 없습니다')
         return
 
-    model = joblib.load(model_file)
-    yhat_test = model.predict(testX)
-    
-    predict_names = out_encoder.inverse_transform(yhat_test)
-    score_test = accuracy_score(testY, predict_names)
-    # 정확도 값
-    yhat_prob = model.predict_proba(testX)
-    class_probability = yhat_prob* 100
-   
+    model = joblib.load(modelFile)
     #test 데이터 갯수만큼 반복
-    for i in range(testX.shape[0]):
-        sum_class_probability += class_probability[i].max()
-        #print('실제 값: %s,  예측 값= %s, 분류 확률 = (%.3f)' % (testY[i], predict_names[i],class_probability[i].max()))
-    print('[%d]정확도: 인식률 mean=%.3f , 분류율 mean = %.3f' % (count, score_test*100, sum_class_probability/testX.shape[0]))
-    return score_test*100 
+
+    num = list(range(0,testX.shape[0]-1)) 
+    out = random.sample(num, valid_count)
+    yhat_test = model.predict(testX[out])
+    
+    #predict_names = out_encoder.inverse_transform(yhat_test)
+    #score_test = accuracy_score(testY, predict_names)
+    # 정확도 값
+    yhat_prob = model.predict_proba(testX[out])
+    class_probability = yhat_prob* 100
+    print(class_probability)
+    sum_class_probability += class_probability
+    return class_probability
+    #print('실제 값: %s,  예측 값= %s, 분류 확률 = (%.3f)' % (testY[i], predict_names[i],class_probability[i].max()))
+    #print('정확도:  분류율 mean = %.3f' % sum_class_probability/testX.shape[0])
+
 
 
 

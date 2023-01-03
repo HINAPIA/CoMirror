@@ -11,7 +11,7 @@ from dataPreProcess import embedding
 import time
 
 embeddingModel = load_model('facenet_keras.h5')
-# csv 파일 생성
+# 인식을 위한 임베딩 데이터 파일 생성
 def create_login_data(embeddingModel, file):
     
     sum = 0
@@ -29,23 +29,23 @@ def create_login_data(embeddingModel, file):
     # 임베딩 된 데이터 배열을 하나의 압축 포맷 파일로 저장 - 파일명 : login-embeddings.npz
     savez_compressed(os.path.join('dataPE', 'files','loginFaceEmbedding',file), newTrainX, trainy )
 
-    # embedding_dataset = os.path.join('dataPE', 'files','login-embeddings.npz')
-    # for i in range(100):
-    #     sum += user_check_PE(i, embedding_dataset, "400")
 
-    # print('****최종 정확도****: %.3f' % (sum/100.0))
-    # print()
-
-create_login_data(embeddingModel,'km-embeddings.npz')
-# create_login_data(embeddingModel,'sy-embeddings.npz')
-# create_login_data(embeddingModel,'cw-embeddings.npz')
-# create_login_data(embeddingModel,'yj-embeddings.npz')
 
 def make_csv(file_name, field_name, datas):
     file_path = './csv/'+file_name
     with open(file_path, 'a', newline='') as f:
         write = csv.writer(f)
         write.writerow(field_name)
+        write.writerows(datas)
+    f.close
+
+def make_csv2(file_name, field_name1,field_name2, datas):
+    file_path = './csv/'+file_name
+    with open(file_path, 'a', newline='') as f:
+        write = csv.writer(f)
+        
+        write.writerow(field_name1)
+        write.writerow(field_name2)
         write.writerows(datas)
     f.close
 
@@ -102,3 +102,38 @@ def check_trainTime_with_people_count():
         datas.append([i,40,end- start])
     field_name = ['훈련하는 사람 수', '훈련 장 수', '시간(s)']
     make_csv('check_trainTime_with_people_count.csv', field_name, datas)
+
+
+def check_trainTime():
+    print("***훈련시간(인식 장 수, 훈련 장 수***")
+    val_files = []
+    count = 0
+    directory = os.path.join('dataPE','files','loginFaceEmbedding')
+    datas = []
+    #인식하는 단일 파일명들 추가
+    for file in os.listdir(directory):
+		# 경로
+        path = os.path.join(directory, file)
+
+        val_files.append(path)
+    field_name = ['얼굴','인식 장 수',' 학습 장 수','확률1','확률2' ,'확률3','확률4']
+    for val_file in val_files:
+        count= count+1
+        #인식 장 수 에 따라 다르게 테스트
+        valid_counts = [1,2,4,10]
+        
+        for valid_count in valid_counts:
+            train_counts = [10,20,30,40]
+            for train_count in train_counts:
+                model_file = "model"+str(train_count)+".pkl"
+                model_file = os.path.join('dataPE','files','model',model_file)
+                # 모델 인식
+                porb_datas = loginPE.user_check_PE(val_file, model_file,valid_count)
+                for prob_data in porb_datas:
+                    data= [f'얼굴 {count}',valid_count, train_count]
+                    data = (data) + list(prob_data)
+                    datas.append(data)
+                #field_name2 = ['훈련 얼굴1', '훈련 얼굴2', '훈련 얼굴3','훈련 얼굴4']
+    make_csv('check_trainTime.csv', field_name, datas)
+        
+check_trainTime()
